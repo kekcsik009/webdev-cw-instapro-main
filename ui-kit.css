@@ -97,7 +97,7 @@ p {
   padding: 15px;
   font-size: 14px;
   line-height: 18px;
-  color: rgb(26, 103, 151);
+  color: rgb(4, 18, 27);
   border: none;
   border-radius: 5px;
   background-color: #e8e8e8;
@@ -159,45 +159,4 @@ strong {
     top: 24px;
     height: 32px;
   }
-}
-
-@keyframes myAnim {
-  0% {
-    animation-timing-function: ease-out;
-    transform: scale(1);
-    transform-origin: center center;
-  }
-
-  10% {
-    animation-timing-function: ease-in;
-    transform: scale(2);
-  }
-
-  17% {
-    animation-timing-function: ease-out;
-    transform: scale(0.98);
-  }
-
-  33% {
-    animation-timing-function: ease-in;
-    transform: scale(0.87);
-  }
-
-  45% {
-    animation-timing-function: ease-out;
-    transform: scale(1);
-  }
-}
-
-.like-button {
-  animation: myAnim 2s ease 0s 1 normal forwards;
-}
-
-.post-image-container {
-  margin-left: -20px;
-  margin-right: -20px;
-  height: 500px;
-  display: flex;
-  justify-content: center;
-  background-color: #030c52;
 }

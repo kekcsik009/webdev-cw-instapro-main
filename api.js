@@ -1,10 +1,9 @@
-// Замени на свой, чтобы получить независимый от других набор данных.
-// "боевая" версия инстапро лежит в ключе prod
-const personalKey = "kekc";
+const personalKey = "sautner-denis";
+const defaultKey = "prod";
 const baseHost = "https://webdev-hw-api.vercel.app";
-const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
+const postsHost = `${baseHost}/api/v1/${defaultKey}/instapro`;
 
-export async function getPosts({ token }) {
+export function getPosts({ token }) {
   return fetch(postsHost, {
     method: "GET",
     headers: {
@@ -15,28 +14,86 @@ export async function getPosts({ token }) {
       if (response.status === 401) {
         throw new Error("Нет авторизации");
       }
+
       return response.json();
     })
     .then((data) => {
-      // Получаем сразу все свойства поста
-      return data.posts.map((post) => {
-        return {
-          name: post.user?.name,
-          description: post.description,
-          time: post.createdAt,
-          postImg: post.imageUrl,
-          userImg: post.user?.imageUrl,
-          id: post.user.id,
-          idPost: post.id,
-          isLiked: post.isLiked,
-          likes: post.likes.length,
-          whoseLike: post.likes[0]?.name,
-        };
-      });
+      return data.posts;
     });
 }
 
-export async function registerUser({ login, password, name, imageUrl }) {
+export function getUserPosts({ token, userId }) {
+  return fetch(postsHost + `/user-posts/${userId}`, {
+    method: "GET",
+    headers: {
+      Authorization: token,
+    },
+  })
+    .then((response) => {
+      if (response.status === 401) {
+        throw new Error("Нет авторизации");
+      }
+
+      return response.json();
+    })
+    .then((data) => {
+      return data.posts;
+    });
+}
+
+export const addPost = ({ token, description, imageUrl }) => {
+  return fetch(postsHost, {
+    method: "POST",
+    body: JSON.stringify({
+      description,
+      imageUrl,
+    }),
+    headers: {
+      Authorization: token,
+    },
+  }).then((response) => {
+    if (response.status === 400) {
+      alert("Выберите фото и добавьте комментарий");
+      throw new Error("Выберите фото и добавьте комментарий");
+    }
+
+    return response.json();
+  });
+};
+
+export const setLike = ({ token, postId }) => {
+  return fetch(postsHost + "/" + postId + "/like", {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    },
+  }).then((response) => {
+    if (response.status === 401) {
+      alert("Лайкать посты могут только авторизованные пользователи");
+      throw new Error("Нет авторизации");
+    }
+
+    return response.json();
+  });
+};
+
+export const removeLike = ({ token, postId }) => {
+  return fetch(postsHost + "/" + postId + "/dislike", {
+    method: "POST",
+    headers: {
+      Authorization: token,
+    },
+  }).then((response) => {
+    if (response.status === 401) {
+      throw new Error("Нет авторизации");
+    }
+
+    return response.json();
+  });
+};
+
+// https://github.com/GlebkaF/webdev-hw-api/blob/main/pages/api/user/README.md#%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B8%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%D1%81%D1%8F
+export function registerUser({ login, password, name, imageUrl }) {
   return fetch(baseHost + "/api/user", {
     method: "POST",
     body: JSON.stringify({
@@ -53,7 +110,7 @@ export async function registerUser({ login, password, name, imageUrl }) {
   });
 }
 
-export async function loginUser({ login, password }) {
+export function loginUser({ login, password }) {
   return fetch(baseHost + "/api/user/login", {
     method: "POST",
     body: JSON.stringify({
@@ -69,7 +126,7 @@ export async function loginUser({ login, password }) {
 }
 
 // Загружает картинку в облако, возвращает url загруженной картинки
-export async function uploadImage({ file }) {
+export function uploadImage({ file }) {
   const data = new FormData();
   data.append("file", file);
 
@@ -78,84 +135,5 @@ export async function uploadImage({ file }) {
     body: data,
   }).then((response) => {
     return response.json();
-  });
-}
-
-// Отправляем POST-запрос на сервер для добавления нового поста
-
-export async function addPost({ token, description, imageUrl }) {
-  return fetch(postsHost, {
-    method: "POST",
-    headers: {
-      Authorization: token,
-    },
-    body: JSON.stringify({
-      description,
-      imageUrl,
-    }),
-  }).then((response) => {
-    if (response.status === 400) {
-      throw new Error("Картинку нужно описать и прикрепить");
-    }
-    return response.json();
-  });
-}
-
-// Получаем список постов пользователя с заданным идентификатором
-
-export async function getUserPosts(userId, token) {
-  return fetch(postsHost + "/user-posts/" + userId, {
-    method: "GET",
-    headers: {
-      Authorization: token,
-    },
-  })
-    .then((response) => {
-      if (response.status === 401) {
-        throw new Error("Нет авторизации");
-      }
-
-      return response.json();
-    })
-    .then((data) => {
-      return data.posts.map((post) => {
-        return {
-          name: post?.user?.name,
-          description: post.description,
-          time: post.createdAt,
-          postImg: post.imageUrl,
-          userImg: post?.user?.imageUrl,
-          id: post.user?.id,
-          idPost: post.idPost,
-          isLiked: post.isLiked,
-          likes: post.likes.length,
-          whoseLike: post?.likes[0]?.name,
-        };
-      });
-    });
-}
-
-// Отправляем POST-запрос на сервер для поста, которому нужно добавить лайк
-export function addLike({ token, idPost }) {
-  return fetch(postsHost + "/" + idPost + "/like", {
-    method: "POST",
-    headers: {
-      Authorization: token,
-    },
-    body: JSON.stringify({
-      idPost,
-    }),
-  });
-}
-// Отправляем POST-запрос на сервер для поста, которому нужно добавить дизлайк
-export function addDislike({ token, idPost }) {
-  return fetch(postsHost + "/" + idPost + "/dislike", {
-    method: "POST",
-    headers: {
-      Authorization: token,
-    },
-    body: JSON.stringify({
-      idPost,
-    }),
   });
 }
