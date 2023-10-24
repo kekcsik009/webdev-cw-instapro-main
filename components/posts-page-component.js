@@ -1,74 +1,123 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage, getToken, renderApp, setPosts } from "../main.js";
+import { posts, goToPage } from "../index.js";
 import { formatDistanceToNow } from "date-fns";
-import { ru } from "date-fns/locale";
-import { setLike, removeLike, getPosts } from "../api.js";
+import ruLocale from "date-fns/locale/ru";
+import { addLike, disLike } from "../api.js";
 
-export function renderPostsPageComponent({ appEl }) {
-  const appPosts = posts.map((post) => {
-    return {
-      userImageUrl: post.user.imageUrl,
-      userName: post.user.name,
-      userId: post.user.id,
-      imageUrl: post.imageUrl,
-      description: post.description,
-      userLogin: post.user.login,
-      date: formatDistanceToNow(new Date(post.createdAt), { locale: ru }),
-      likes: post.likes,
-      isLiked: post.isLiked,
-      id: post.id,
-    };
-  });
+function createPostHtml(post, index, currentUserName) {
+  const likesNames = post.likes.map((like) => like.name).join(", ");
+  return `
+    <li class="post">
+      <div class="post-header" data-user-id="${post.user.id}">
+        <img src="${post.user.imageUrl}" class="post-header__user-image">
+        <p class="post-header__user-name">${post.user.name}</p>
+      </div>
+      <div class="post-image-container">
+        <img class="post-image" src="${post.imageUrl}">
+      </div>
+      <div class="post-likes">
+        <button data-post-id="${
+          post.id
+        }" class="like-button" data-index = ${index}>
+          <img src="${
+            post.isLiked
+              ? "./assets/images/like-active.svg"
+              : "./assets/images/like-not-active.svg"
+          }">
+        </button>
+        <p class="post-likes-text">
+        Нравится: <strong>${post.likes.length} (${likesNames})</strong>
+        </p>
+      </div>
+      <p class="post-text">
+        <span class="user-name">${post.user.name}</span>
+        ${post.description}
+      </p>
+      <p class="post-date">
+        ${formatDistanceToNow(new Date(post.createdAt), {
+          locale: ruLocale,
+        })} назад
+      </p>
+    </li>`;
+}
 
-  const postsHtml = appPosts.map((element, index) => {
-    return `
-      <div class="page-container">
-        <div class="header-container"></div>
-        <ul class="posts">
-          <li class="post" data-index=${index}>
-            <div class="post-header" data-user-id="${element.userId}">
-                <img src="${
-                  element.userImageUrl
-                }" class="post-header__user-image">
-                <p class="post-header__user-name">${element.userName}</p>
-            </div>
-            <div class="post-image-container">
-              <img class="post-image" src="${element.imageUrl}">
-            </div>
-            <div class="post-likes">
-              <button data-post-id="${element.id}" data-like="${
-      element.isLiked ? "true" : ""
-    }" data-index="${index}" class="like-button">
-                <img src="${
-                  element.isLiked
-                    ? `./assets/images/like-active.svg`
-                    : `./assets/images/like-not-active.svg`
-                }">
-              </button>
-              <p class="post-likes-text">
-              Нравится: <strong>${
-                element.likes.length >= 1 ? element.likes[0].name : "0"
-              }</strong> ${
-      element.likes.length - 1 > 0
-        ? "и ещё" + " " + (element.likes.length - 1)
-        : ""
+function getPostHtmls(posts) {
+  return posts.map(createPostHtml).join("");
+}
+
+export function renderPostsPageComponent({
+  appEl,
+  posts,
+  userId,
+  token,
+  currentUserName,
+}) {
+  console.log("Токен в renderPostsPageComponent:", token);
+
+  console.log("Актуальный список постов:", posts);
+
+  const postsHtml = getPostHtmls(posts);
+
+  const appHtml = `
+    <div class="page-container">
+      <div class="header-container"></div>
+      <ul class="posts">
+        ${postsHtml}
+      </ul>
+    </div>`;
+
+  appEl.innerHTML = appHtml;
+
+  const like = (posts, token) => {
+    console.log("Токен в функции like:", token);
+    const likeButtons = document.querySelectorAll(".like-button");
+    for (const like of likeButtons) {
+      like.addEventListener("click", (event) => {
+        if (!token) {
+          alert("Вы должны войти в систему, чтобы ставить лайки");
+          return;
+        }
+        event.stopPropagation();
+        const postIndex = parseInt(like.dataset.index, 10);
+        const post = posts[postIndex];
+        console.log("Current post object:", post);
+        const postLikesText = like
+          .closest(".post-likes")
+          .querySelector(".post-likes-text strong");
+
+        // При участии функции из апи
+
+        if (post.isLiked === false) {
+          addLike({ token, id: post.id })
+            .then(() => {
+              post.isLiked = true;
+              like.querySelector("img").src = "./assets/images/like-active.svg";
+              post.likes.push({ id: userId, name: currentUserName });
+              postLikesText.textContent = `${post.likes.length} (${currentUserName})`;
+            })
+            .catch((error) => {
+              console.error("Ошибка при добавлении лайка:", error);
+            });
+        } else if (post.isLiked === true) {
+          disLike({ token, id: post.id })
+            .then(() => {
+              post.isLiked = false;
+              like.querySelector("img").src =
+                "./assets/images/like-not-active.svg";
+              post.likes = post.likes.filter(
+                (like) => like.name !== currentUserName
+              );
+              postLikesText.textContent = post.likes.length;
+            })
+            .catch((error) => {
+              console.error("Ошибка при удалении лайка:", error);
+            });
+        }
+      });
     }
-              </p >
-            </div >
-            <p class="post-text">
-              <span class="user-name">${element.userName}</span>
-              ${element.description}
-            </p>
-            <p class="post-date">
-              ${element.date} назад
-            </p>
-          </li >                  
-        </ul >
-      </div > `;
-  });
-
-  appEl.innerHTML = postsHtml;
+  };
+  like(posts, token);
 
   renderHeaderComponent({
     element: document.querySelector(".header-container"),
@@ -81,45 +130,4 @@ export function renderPostsPageComponent({ appEl }) {
       });
     });
   }
-
-  const likeEventListener = () => {
-    const likeButtons = document.querySelectorAll(".like-button");
-
-    likeButtons.forEach((likeButton) => {
-      likeButton.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const postId = likeButton.dataset.postId;
-        const index = likeButton.dataset.index;
-        likeButton.classList.add("shake-bottom");
-
-        if (posts[index].isLiked) {
-          removeLike({ token: getToken(), postId })
-            .then(() => {
-              posts[index].isLiked = false;
-            })
-            .then(() => {
-              getPosts({ token: getToken() }).then((response) => {
-                setPosts(response);
-                likeButton.classList.remove("shake-bottom");
-                renderApp();
-              });
-            });
-        } else {
-          setLike({ token: getToken(), postId })
-            .then(() => {
-              posts[index].isLiked = true;
-            })
-            .then(() => {
-              getPosts({ token: getToken() }).then((response) => {
-                setPosts(response);
-                likeButton.classList.remove("shake-bottom");
-                renderApp();
-              });
-            });
-        }
-      });
-    });
-  };
-
-  likeEventListener();
 }
