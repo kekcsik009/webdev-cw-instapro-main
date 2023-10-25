@@ -49,3 +49,12 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
     });
   }
 }
+document.getElementById("add-button").addEventListener("click", () => {
+  if (!imageUrl) {
+    alert("Не указано фото");
+    return;
+  }
+  if (!description) {
+    alert("Не заполнено описание фото");
+    return;
+  }
