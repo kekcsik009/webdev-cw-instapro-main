@@ -134,14 +134,6 @@ export const renderApp = () => {
       appEl,
       onAddPostClick({ description, imageUrl }) {
         createPost({ token: getToken(), description, imageUrl })
-        if (!imageUrl) {
-          alert("Не указано фото");
-          return;
-        }
-        if (!description) {
-          alert("Не заполнено описание фото");
-          return;
-        }
           .then((post) => {
             console.log("Добавленный пост:", post);
             updatePostsAndGoToPostsPage();

@@ -2,7 +2,7 @@
   "name": "instapro",
   "version": "1.0.0",
   "description": "MVP аналога популярной соц. сети для обмена фотографиями",
-  "main": "main.js",
+  "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack --mode production"

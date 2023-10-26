@@ -1,4 +1,4 @@
-const personalKey = "kekc"; //prod - боевая версия instapro
+const personalKey = "prod"; //prod - боевая версия instapro
 const baseHost = "https://webdev-hw-api.vercel.app";
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
 
