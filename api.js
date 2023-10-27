@@ -1,4 +1,4 @@
-const personalKey = "prod"; //prod - боевая версия instapro
+const personalKey = "kekc"; //prod - боевая версия instapro
 const baseHost = "https://webdev-hw-api.vercel.app";
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
 
@@ -15,6 +15,15 @@ export function createPost({ token, description, imageUrl }) {
   }).then((response) => {
     if (response.status === 401) {
       throw new Error("Нет авторизации");
+    }
+    if (!imageUrl) {
+      alert("Не указано фото");
+      return;
+    }
+
+    if (!description) {
+      alert("Не заполнено описание фото");
+      return;
     }
     return response.json();
   });
