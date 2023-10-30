@@ -16,7 +16,7 @@
   \****************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   addPost: () => (/* binding */ addPost),\n/* harmony export */   getPosts: () => (/* binding */ getPosts),\n/* harmony export */   getUserPosts: () => (/* binding */ getUserPosts),\n/* harmony export */   loginUser: () => (/* binding */ loginUser),\n/* harmony export */   registerUser: () => (/* binding */ registerUser),\n/* harmony export */   removeLike: () => (/* binding */ removeLike),\n/* harmony export */   setLike: () => (/* binding */ setLike),\n/* harmony export */   uploadImage: () => (/* binding */ uploadImage)\n/* harmony export */ });\nconst personalKey = \"sautner-denis\";\nconst defaultKey = \"prod\"\nconst baseHost = \"https://webdev-hw-api.vercel.app\";\nconst postsHost = `${baseHost}/api/v1/${defaultKey}/instapro`;\n\nfunction getPosts({ token }) {\n  return fetch(postsHost, {\n    method: \"GET\",\n    headers: {\n      Authorization: token,\n    },\n  })\n    .then((response) => {\n      if (response.status === 401) {\n        throw new Error(\"Нет авторизации\");\n      }\n\n      return response.json();\n    })\n    .then((data) => {\n      return data.posts;\n    });\n}\n\nfunction getUserPosts({ token, userId }) {\n  return fetch(postsHost + `/user-posts/${userId}`, {\n    method: \"GET\",\n    headers: {\n      Authorization: token,\n    },\n  })\n    .then((response) => {\n      if (response.status === 401) {\n        throw new Error(\"Нет авторизации\");\n      }\n\n      return response.json();\n    })\n    .then((data) => {\n      return data.posts;\n    });\n}\n\nconst addPost = ({ token, description, imageUrl }) => {\n  return fetch(postsHost, {\n    method: \"POST\",\n    body: JSON.stringify({\n      description,\n      imageUrl,\n    }),\n    headers: {\n      Authorization: token,\n    },\n  })\n    .then((response) => {\n      if (response.status === 400) {\n        alert(\"Выберите фото и добавьте комментарий\");\n        throw new Error(\"Выберите фото и добавьте комментарий\");\n      }\n\n      return response.json();\n    })\n}\n\nconst setLike = ({ token, postId }) => {\n  return fetch(postsHost + '/' + postId + \"/like\", {\n    method: \"POST\",\n    headers: {\n      Authorization: token,\n    },\n  })\n    .then((response) => {\n      if (response.status === 401) {\n        alert('Лайкать посты могут только авторизованные пользователи');\n        throw new Error(\"Нет авторизации\");\n      }\n\n      return response.json();\n    })\n}\n\nconst removeLike = ({ token, postId }) => {\n  return fetch(postsHost + '/' + postId + \"/dislike\", {\n    method: \"POST\",\n    headers: {\n      Authorization: token,\n    },\n  })\n    .then((response) => {\n      if (response.status === 401) {\n        throw new Error(\"Нет авторизации\");\n      }\n\n      return response.json();\n    })\n}\n\n// https://github.com/GlebkaF/webdev-hw-api/blob/main/pages/api/user/README.md#%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B8%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%D1%81%D1%8F\nfunction registerUser({ login, password, name, imageUrl }) {\n  return fetch(baseHost + \"/api/user\", {\n    method: \"POST\",\n    body: JSON.stringify({\n      login,\n      password,\n      name,\n      imageUrl,\n    }),\n  }).then((response) => {\n    if (response.status === 400) {\n      throw new Error(\"Такой пользователь уже существует\");\n    }\n    return response.json();\n  });\n}\n\nfunction loginUser({ login, password }) {\n  return fetch(baseHost + \"/api/user/login\", {\n    method: \"POST\",\n    body: JSON.stringify({\n      login,\n      password,\n    }),\n  }).then((response) => {\n    if (response.status === 400) {\n      throw new Error(\"Неверный логин или пароль\");\n    }\n    return response.json();\n  });\n}\n\n// Загружает картинку в облако, возвращает url загруженной картинки\nfunction uploadImage({ file }) {\n  const data = new FormData();\n  data.append(\"file\", file);\n\n  return fetch(baseHost + \"/api/upload/image\", {\n    method: \"POST\",\n    body: data,\n  }).then((response) => {\n    return response.json();\n  });\n}\n\n\n//# sourceURL=webpack://instapro/./api.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   addLike: () => (/* binding */ addLike),\n/* harmony export */   createPost: () => (/* binding */ createPost),\n/* harmony export */   disLike: () => (/* binding */ disLike),\n/* harmony export */   getPosts: () => (/* binding */ getPosts),\n/* harmony export */   getPostsByUser: () => (/* binding */ getPostsByUser),\n/* harmony export */   loginUser: () => (/* binding */ loginUser),\n/* harmony export */   registerUser: () => (/* binding */ registerUser),\n/* harmony export */   uploadImage: () => (/* binding */ uploadImage)\n/* harmony export */ });\nconst personalKey = \"kekc\"; //prod - боевая версия instapro\nconst baseHost = \"https://webdev-hw-api.vercel.app\";\nconst postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;\nfunction createPost({\n  token,\n  description,\n  imageUrl\n}) {\n  return fetch(postsHost, {\n    method: \"POST\",\n    headers: {\n      Authorization: token\n    },\n    body: JSON.stringify({\n      description,\n      imageUrl\n    })\n  }).then(response => {\n    if (response.status === 401) {\n      throw new Error(\"Нет авторизации\");\n    }\n    if (!imageUrl) {\n      alert(\"Не указано фото\");\n      return;\n    }\n    if (!description) {\n      alert(\"Не заполнено описание фото\");\n      return;\n    }\n    return response.json();\n  });\n}\nfunction getPosts({\n  token\n}) {\n  return fetch(postsHost, {\n    method: \"GET\",\n    headers: {\n      Authorization: token\n    }\n  }).then(response => {\n    if (response.status === 401) {\n      throw new Error(\"Нет авторизации\");\n    }\n    return response.json();\n  }).then(data => {\n    return data.posts;\n  });\n}\nconst getPostsByUser = ({\n  token,\n  id\n}) => {\n  return fetch(`${postsHost}/user-posts/${id}`, {\n    method: \"GET\",\n    headers: {\n      Authorization: token\n    }\n  }).then(response => response.json());\n};\nfunction registerUser({\n  login,\n  password,\n  name,\n  imageUrl\n}) {\n  // https://github.com/GlebkaF/webdev-hw-api/blob/main/pages/api/user/README.md#%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B8%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%D1%81%D1%8F\n  return fetch(baseHost + \"/api/user\", {\n    method: \"POST\",\n    body: JSON.stringify({\n      login,\n      password,\n      name,\n      imageUrl\n    })\n  }).then(response => {\n    if (response.status === 400) {\n      throw new Error(\"Такой пользователь уже существует\");\n    }\n    return response.json();\n  });\n}\nfunction loginUser({\n  login,\n  password\n}) {\n  return fetch(baseHost + \"/api/user/login\", {\n    method: \"POST\",\n    body: JSON.stringify({\n      login,\n      password\n    })\n  }).then(response => {\n    if (response.status === 400) {\n      throw new Error(\"Неверный логин или пароль\");\n    }\n    return response.json();\n  });\n}\nfunction uploadImage({\n  file\n}) {\n  // Загружает картинку в облако, возвращает url загруженной картинки\n  const data = new FormData();\n  data.append(\"file\", file);\n  return fetch(baseHost + \"/api/upload/image\", {\n    method: \"POST\",\n    body: data\n  }).then(response => {\n    return response.json();\n  });\n}\nfunction addLike({\n  token,\n  id\n}) {\n  return fetch(postsHost + `/${id}/like`, {\n    method: \"POST\",\n    headers: {\n      Authorization: token\n    }\n  }).then(response => {\n    if (response.status === 401) {\n      throw new Error(\"Нет авторизации\");\n    }\n    return response.json();\n  });\n}\nfunction disLike({\n  token,\n  id\n}) {\n  return fetch(postsHost + `/${id}/dislike`, {\n    method: \"POST\",\n    headers: {\n      Authorization: token\n    }\n  }).then(response => {\n    if (response.status === 401) {\n      throw new Error(\"Нет авторизации\");\n    }\n    return response.json();\n  });\n}\n\n//# sourceURL=webpack://instapro/./api.js?");
 
 /***/ }),
 
@@ -26,7 +26,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \***********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderAddPostPageComponent: () => (/* binding */ renderAddPostPageComponent)\n/* harmony export */ });\n/* harmony import */ var _header_component_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./header-component.js */ \"./components/header-component.js\");\n/* harmony import */ var _upload_image_component_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./upload-image-component.js */ \"./components/upload-image-component.js\");\n\n\n\nfunction renderAddPostPageComponent({ appEl, onAddPostClick }) {\n  let imageUrl = \"\";\n\n  const render = () => {\n    const appHtml = `\n    <div class=\"page-container\">\n      <div class=\"header-container\"></div>\n      <div class=\"form\">\n        <h3 class=\"form-title\">Новый пост</h3>\n        <div class=\"form-inputs\">\n          <div class=\"upload-image-container\">\n            <div class=\"upload=image\">      \n              <label class=\"file-upload-label secondary-button\">\n                <input type=\"file\" class=\"file-upload-input\"\" style=\"display:none\">\n                Выберите фото\n              </label>    \n            </div>\n          </div>\n          <label>\n            Добавьте комментарий:\n            <textarea class=\"input textarea\" rows=\"2\" id=\"description\"></textarea>\n          </label>\n          <button class=\"button\" id=\"add-button\">Добавить</button>\n        </div>\n      </div>\n  `;\n\n    appEl.innerHTML = appHtml;\n\n    (0,_header_component_js__WEBPACK_IMPORTED_MODULE_0__.renderHeaderComponent)({\n      element: document.querySelector(\".header-container\"),\n    });\n\n    const uploadImageContainer = appEl.querySelector(\".upload-image-container\");\n\n    if (uploadImageContainer) {\n      (0,_upload_image_component_js__WEBPACK_IMPORTED_MODULE_1__.renderUploadImageComponent)({\n        element: appEl.querySelector(\".upload-image-container\"),\n        onImageUrlChange(newImageUrl) {\n          imageUrl = newImageUrl;\n        },\n      });\n    }\n\n\n    document.getElementById(\"add-button\").addEventListener(\"click\", () => {\n      const description = document.getElementById(\"description\").value;\n\n      onAddPostClick({\n        description: description,\n        imageUrl: imageUrl,\n      });\n    });\n  };\n\n  render();\n};\n\n\n//# sourceURL=webpack://instapro/./components/add-post-page-component.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderAddPostPageComponent: () => (/* binding */ renderAddPostPageComponent)\n/* harmony export */ });\n/* harmony import */ var _header_component_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./header-component.js */ \"./components/header-component.js\");\n/* harmony import */ var _upload_image_component_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./upload-image-component.js */ \"./components/upload-image-component.js\");\n\n\nfunction renderAddPostPageComponent({\n  appEl,\n  onAddPostClick\n}) {\n  const render = () => {\n    // TODO: Реализовать страницу добавления поста\n    const appHtml = `\n    <div class=\"page-container\">\n    <div class=\"header-container\"></div>\n    <h3 class=\"form-title\">\n      Cтраница добавления поста\n    </h3>\n    <div class=\"form-inputs\">\n      <div class=\"upload-image-container\"></div>\n      <input type=\"text\" id=\"comment-input\" class=\"input\" placeholder=\"Комментарий\" />\n      <button class=\"button\" id=\"add-button\">Добавить</button>\n  </div>\n  `;\n    appEl.innerHTML = appHtml;\n    document.getElementById(\"add-button\").addEventListener(\"click\", () => {\n      const inputElement = document.getElementById(\"comment-input\");\n      onAddPostClick({\n        description: inputElement.value.replaceAll(\"&\", \"&amp;\").replaceAll(\"<\", \"&lt;\").replaceAll(\">\", \"&gt;\").replaceAll('\"', \"&quot;\"),\n        imageUrl: imageUrl\n      });\n    });\n  };\n  render();\n  (0,_header_component_js__WEBPACK_IMPORTED_MODULE_0__.renderHeaderComponent)({\n    element: document.querySelector(\".header-container\")\n  });\n  const uploadImageContainer = appEl.querySelector(\".upload-image-container\");\n  let imageUrl = \"\";\n  if (uploadImageContainer) {\n    (0,_upload_image_component_js__WEBPACK_IMPORTED_MODULE_1__.renderUploadImageComponent)({\n      element: appEl.querySelector(\".upload-image-container\"),\n      onImageUrlChange(newImageUrl) {\n        imageUrl = newImageUrl;\n      }\n    });\n  }\n}\n\n//# sourceURL=webpack://instapro/./components/add-post-page-component.js?");
 
 /***/ }),
 
@@ -36,7 +36,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \*******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderAuthPageComponent: () => (/* binding */ renderAuthPageComponent)\n/* harmony export */ });\n/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api.js */ \"./api.js\");\n/* harmony import */ var _header_component_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./header-component.js */ \"./components/header-component.js\");\n/* harmony import */ var _upload_image_component_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./upload-image-component.js */ \"./components/upload-image-component.js\");\n\n\n\n\nfunction renderAuthPageComponent({ appEl, setUser }) {\n  let isLoginMode = true;\n  let imageUrl = \"\";\n\n  const renderForm = () => {\n    const appHtml = `\n      <div class=\"page-container\">\n          <div class=\"header-container\"></div>\n          <div class=\"form\">\n              <h3 class=\"form-title\">\n                ${\n                  isLoginMode\n                    ? \"Вход в&nbsp;Instapro\"\n                    : \"Регистрация в&nbsp;Instapro\"\n                }\n                </h3>\n              <div class=\"form-inputs\">\n    \n                  ${\n                    !isLoginMode\n                      ? `\n                      <div class=\"upload-image-container\"></div>\n                      <input type=\"text\" id=\"name-input\" class=\"input\" placeholder=\"Имя\" />\n                      `\n                      : \"\"\n                  }\n                  \n                  <input type=\"text\" id=\"login-input\" class=\"input\" placeholder=\"Логин\" />\n                  <input type=\"password\" id=\"password-input\" class=\"input\" placeholder=\"Пароль\" />\n                  \n                  <div class=\"form-error\"></div>\n                  \n                  <button class=\"button\" id=\"login-button\">${\n                    isLoginMode ? \"Войти\" : \"Зарегистрироваться\"\n                  }</button>\n              </div>\n            \n              <div class=\"form-footer\">\n                <p class=\"form-footer-title\">\n                  ${isLoginMode ? \"Нет аккаунта?\" : \"Уже есть аккаунт?\"}\n                  <button class=\"link-button\" id=\"toggle-button\">\n                    ${isLoginMode ? \"Зарегистрироваться.\" : \"Войти.\"}\n                  </button>\n                </p> \n               \n              </div>\n          </div>\n      </div>    \n`;\n\n    appEl.innerHTML = appHtml;\n\n    // Не вызываем перерендер, чтобы не сбрасывалась заполненная форма\n    // Точечно обновляем кусочек дом дерева\n    const setError = (message) => {\n      appEl.querySelector(\".form-error\").textContent = message;\n    };\n\n    (0,_header_component_js__WEBPACK_IMPORTED_MODULE_1__.renderHeaderComponent)({\n      element: document.querySelector(\".header-container\"),\n    });\n\n    const uploadImageContainer = appEl.querySelector(\".upload-image-container\");\n\n    if (uploadImageContainer) {\n      (0,_upload_image_component_js__WEBPACK_IMPORTED_MODULE_2__.renderUploadImageComponent)({\n        element: appEl.querySelector(\".upload-image-container\"),\n        onImageUrlChange(newImageUrl) {\n          imageUrl = newImageUrl;\n        },\n      });\n    }\n\n    document.getElementById(\"login-button\").addEventListener(\"click\", () => {\n      setError(\"\");\n\n      if (isLoginMode) {\n        const login = document.getElementById(\"login-input\").value;\n        const password = document.getElementById(\"password-input\").value;\n\n        if (!login) {\n          alert(\"Введите логин\");\n          return;\n        }\n\n        if (!password) {\n          alert(\"Введите пароль\");\n          return;\n        }\n\n        (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.loginUser)({\n          login: login,\n          password: password,\n        })\n          .then((user) => {\n            setUser(user.user);\n          })\n          .catch((error) => {\n            console.warn(error);\n            setError(error.message);\n          });\n      } else {\n        const login = document.getElementById(\"login-input\").value;\n        const name = document.getElementById(\"name-input\").value;\n        const password = document.getElementById(\"password-input\").value;\n        if (!name) {\n          alert(\"Введите имя\");\n          return;\n        }\n        if (!login) {\n          alert(\"Введите логин\");\n          return;\n        }\n\n        if (!password) {\n          alert(\"Введите пароль\");\n          return;\n        }\n\n        if (!imageUrl) {\n          alert(\"Не выбрана фотография\");\n          return;\n        }\n\n        (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.registerUser)({\n          login: login,\n          password: password,\n          name: name,\n          imageUrl,\n        })\n          .then((user) => {\n            setUser(user.user);\n          })\n          .catch((error) => {\n            console.warn(error);\n            setError(error.message);\n          });\n      }\n    });\n\n    document.getElementById(\"toggle-button\").addEventListener(\"click\", () => {\n      isLoginMode = !isLoginMode;\n      renderForm();\n    });\n  };\n\n  renderForm();\n}\n\n\n//# sourceURL=webpack://instapro/./components/auth-page-component.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderAuthPageComponent: () => (/* binding */ renderAuthPageComponent)\n/* harmony export */ });\n/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api.js */ \"./api.js\");\n/* harmony import */ var _header_component_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./header-component.js */ \"./components/header-component.js\");\n/* harmony import */ var _upload_image_component_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./upload-image-component.js */ \"./components/upload-image-component.js\");\n\n\n\nfunction renderAuthPageComponent({\n  appEl,\n  setUser\n}) {\n  let isLoginMode = true;\n  let imageUrl = \"\";\n  const renderForm = () => {\n    const appHtml = `\n      <div class=\"page-container\">\n          <div class=\"header-container\"></div>\n          <div class=\"form\">\n              <h3 class=\"form-title\">\n                ${isLoginMode ? \"Вход в&nbsp;Instapro\" : \"Регистрация в&nbsp;Instapro\"}\n                </h3>\n              <div class=\"form-inputs\">\n    \n                  ${!isLoginMode ? `\n                      <div class=\"upload-image-container\"></div>\n                      <input type=\"text\" id=\"name-input\" class=\"input\" placeholder=\"Имя\" />\n                      ` : \"\"}\n                  \n                  <input type=\"text\" id=\"login-input\" class=\"input\" placeholder=\"Логин\" />\n                  <input type=\"password\" id=\"password-input\" class=\"input\" placeholder=\"Пароль\" />\n                  \n                  <div class=\"form-error\"></div>\n                  \n                  <button class=\"button\" id=\"login-button\">${isLoginMode ? \"Войти\" : \"Зарегистрироваться\"}</button>\n              </div>\n            \n              <div class=\"form-footer\">\n                <p class=\"form-footer-title\">\n                  ${isLoginMode ? \"Нет аккаунта?\" : \"Уже есть аккаунт?\"}\n                  <button class=\"link-button\" id=\"toggle-button\">\n                    ${isLoginMode ? \"Зарегистрироваться.\" : \"Войти.\"}\n                  </button>\n                </p> \n               \n              </div>\n          </div>\n      </div>    \n`;\n    appEl.innerHTML = appHtml;\n\n    // Не вызываем перерендер, чтобы не сбрасывалась заполненная форма\n    // Точечно обновляем кусочек дом дерева\n    const setError = message => {\n      appEl.querySelector(\".form-error\").textContent = message;\n    };\n    (0,_header_component_js__WEBPACK_IMPORTED_MODULE_1__.renderHeaderComponent)({\n      element: document.querySelector(\".header-container\")\n    });\n    const uploadImageContainer = appEl.querySelector(\".upload-image-container\");\n    if (uploadImageContainer) {\n      (0,_upload_image_component_js__WEBPACK_IMPORTED_MODULE_2__.renderUploadImageComponent)({\n        element: appEl.querySelector(\".upload-image-container\"),\n        onImageUrlChange(newImageUrl) {\n          imageUrl = newImageUrl;\n        }\n      });\n    }\n    document.getElementById(\"login-button\").addEventListener(\"click\", () => {\n      setError(\"\");\n      if (isLoginMode) {\n        const login = document.getElementById(\"login-input\").value;\n        const password = document.getElementById(\"password-input\").value;\n        if (!login) {\n          alert(\"Введите логин\");\n          return;\n        }\n        if (!password) {\n          alert(\"Введите пароль\");\n          return;\n        }\n        (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.loginUser)({\n          login: login,\n          password: password\n        }).then(user => {\n          setUser(user.user);\n        }).catch(error => {\n          console.warn(error);\n          setError(error.message);\n        });\n      } else {\n        const login = document.getElementById(\"login-input\").value;\n        const name = document.getElementById(\"name-input\").value;\n        const password = document.getElementById(\"password-input\").value;\n        if (!name) {\n          alert(\"Введите имя\");\n          return;\n        }\n        if (!login) {\n          alert(\"Введите логин\");\n          return;\n        }\n        if (!password) {\n          alert(\"Введите пароль\");\n          return;\n        }\n        if (!imageUrl) {\n          alert(\"Не выбрана фотография\");\n          return;\n        }\n        (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.registerUser)({\n          login: login,\n          password: password,\n          name: name,\n          imageUrl\n        }).then(user => {\n          setUser(user.user);\n        }).catch(error => {\n          console.warn(error);\n          setError(error.message);\n        });\n      }\n    });\n    document.getElementById(\"toggle-button\").addEventListener(\"click\", () => {\n      isLoginMode = !isLoginMode;\n      renderForm();\n    });\n  };\n  renderForm();\n}\n\n//# sourceURL=webpack://instapro/./components/auth-page-component.js?");
 
 /***/ }),
 
@@ -46,7 +46,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderHeaderComponent: () => (/* binding */ renderHeaderComponent)\n/* harmony export */ });\n/* harmony import */ var _main_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../main.js */ \"./main.js\");\n/* harmony import */ var _routes_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../routes.js */ \"./routes.js\");\n\n\n\nfunction renderHeaderComponent({ element }) {\n  element.innerHTML = `\n  <div class=\"page-header\">\n      <h1 class=\"logo\">instapro</h1>\n      <button class=\"header-button add-or-login-button\">\n      ${_main_js__WEBPACK_IMPORTED_MODULE_0__.user\n      ? `<div title=\"Добавить пост\" class=\"add-post-sign\"></div>`\n      : \"Войти\"\n    }\n      </button>\n      ${_main_js__WEBPACK_IMPORTED_MODULE_0__.user\n      ? `<button title=\"${_main_js__WEBPACK_IMPORTED_MODULE_0__.user.name}\" class=\"header-button logout-button\">Выйти</button>`\n      : \"\"\n    }  \n  </div>\n  \n`;\n\n  element\n    .querySelector(\".add-or-login-button\")\n    .addEventListener(\"click\", () => {\n      if (_main_js__WEBPACK_IMPORTED_MODULE_0__.user) {\n        (0,_main_js__WEBPACK_IMPORTED_MODULE_0__.goToPage)(_routes_js__WEBPACK_IMPORTED_MODULE_1__.ADD_POSTS_PAGE);\n      } else {\n        (0,_main_js__WEBPACK_IMPORTED_MODULE_0__.goToPage)(_routes_js__WEBPACK_IMPORTED_MODULE_1__.AUTH_PAGE);\n      }\n    });\n\n  element.querySelector(\".logo\").addEventListener(\"click\", () => {\n    (0,_main_js__WEBPACK_IMPORTED_MODULE_0__.goToPage)(_routes_js__WEBPACK_IMPORTED_MODULE_1__.POSTS_PAGE);\n  });\n\n  element.querySelector(\".logout-button\")?.addEventListener(\"click\", _main_js__WEBPACK_IMPORTED_MODULE_0__.logout);\n\n  return element;\n}\n\n\n//# sourceURL=webpack://instapro/./components/header-component.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderHeaderComponent: () => (/* binding */ renderHeaderComponent)\n/* harmony export */ });\n/* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../index.js */ \"./index.js\");\n/* harmony import */ var _routes_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../routes.js */ \"./routes.js\");\n\n\nfunction renderHeaderComponent({\n  element\n}) {\n  element.innerHTML = `\n  <div class=\"page-header\">\n      <h1 class=\"logo\">instapro</h1>\n      <button class=\"header-button add-or-login-button\">\n      ${_index_js__WEBPACK_IMPORTED_MODULE_0__.user ? `<div title=\"Добавить пост\" class=\"add-post-sign\"></div>` : \"Войти\"}\n      </button>\n      ${_index_js__WEBPACK_IMPORTED_MODULE_0__.user ? `<button title=\"${_index_js__WEBPACK_IMPORTED_MODULE_0__.user.name}\" class=\"header-button logout-button\">Выйти</button>` : \"\"}  \n  </div>\n  \n`;\n  element.querySelector(\".add-or-login-button\").addEventListener(\"click\", () => {\n    if (_index_js__WEBPACK_IMPORTED_MODULE_0__.user) {\n      (0,_index_js__WEBPACK_IMPORTED_MODULE_0__.goToPage)(_routes_js__WEBPACK_IMPORTED_MODULE_1__.ADD_POSTS_PAGE);\n    } else {\n      (0,_index_js__WEBPACK_IMPORTED_MODULE_0__.goToPage)(_routes_js__WEBPACK_IMPORTED_MODULE_1__.AUTH_PAGE);\n    }\n  });\n  element.querySelector(\".logo\").addEventListener(\"click\", () => {\n    (0,_index_js__WEBPACK_IMPORTED_MODULE_0__.goToPage)(_routes_js__WEBPACK_IMPORTED_MODULE_1__.POSTS_PAGE);\n  });\n  element.querySelector(\".logout-button\")?.addEventListener(\"click\", _index_js__WEBPACK_IMPORTED_MODULE_0__.logout);\n  return element;\n}\n\n//# sourceURL=webpack://instapro/./components/header-component.js?");
 
 /***/ }),
 
@@ -56,7 +56,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \**********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderLoadingPageComponent: () => (/* binding */ renderLoadingPageComponent)\n/* harmony export */ });\n/* harmony import */ var _header_component_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./header-component.js */ \"./components/header-component.js\");\n\n\nfunction renderLoadingPageComponent({ appEl, user, goToPage }) {\n  const appHtml = `\n              <div class=\"page-container\">\n                <div class=\"header-container\"></div>\n                <div class=\"loading-page\">\n                  <div class=\"loader\"><div></div><div></div><div></div></div>\n                </div>\n              </div>`;\n\n  appEl.innerHTML = appHtml;\n\n  (0,_header_component_js__WEBPACK_IMPORTED_MODULE_0__.renderHeaderComponent)({\n    user,\n    element: document.querySelector(\".header-container\"),\n    goToPage,\n  });\n}\n\n\n//# sourceURL=webpack://instapro/./components/loading-page-component.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderLoadingPageComponent: () => (/* binding */ renderLoadingPageComponent)\n/* harmony export */ });\n/* harmony import */ var _header_component_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./header-component.js */ \"./components/header-component.js\");\n\nfunction renderLoadingPageComponent({\n  appEl,\n  user,\n  goToPage\n}) {\n  const appHtml = `\n              <div class=\"page-container\">\n                <div class=\"header-container\"></div>\n                <div class=\"loading-page\">\n                  <div class=\"loader\"><div></div><div></div><div></div></div>\n                </div>\n              </div>`;\n  appEl.innerHTML = appHtml;\n  (0,_header_component_js__WEBPACK_IMPORTED_MODULE_0__.renderHeaderComponent)({\n    user,\n    element: document.querySelector(\".header-container\"),\n    goToPage\n  });\n}\n\n//# sourceURL=webpack://instapro/./components/loading-page-component.js?");
 
 /***/ }),
 
@@ -66,7 +66,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderPostsPageComponent: () => (/* binding */ renderPostsPageComponent)\n/* harmony export */ });\n/* harmony import */ var _routes_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../routes.js */ \"./routes.js\");\n/* harmony import */ var _header_component_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./header-component.js */ \"./components/header-component.js\");\n/* harmony import */ var _main_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../main.js */ \"./main.js\");\n/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! date-fns */ \"./node_modules/date-fns/esm/formatDistanceToNow/index.js\");\n/* harmony import */ var date_fns_locale__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! date-fns/locale */ \"./node_modules/date-fns/esm/locale/ru/index.js\");\n/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api.js */ \"./api.js\");\n\n\n\n\n\n\n\nfunction renderPostsPageComponent({ appEl }) {\n\n  const appPosts = _main_js__WEBPACK_IMPORTED_MODULE_2__.posts.map((post) => {\n    return {\n      userImageUrl: post.user.imageUrl,\n      userName: post.user.name,\n      userId: post.user.id,\n      imageUrl: post.imageUrl,\n      description: post.description,\n      userLogin: post.user.login,\n      date: (0,date_fns__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(new Date(post.createdAt), { locale: date_fns_locale__WEBPACK_IMPORTED_MODULE_5__[\"default\"] }),\n      likes: post.likes,\n      isLiked: post.isLiked,\n      id: post.id,\n    }\n  })\n\n  const postsHtml = appPosts.map((element, index) => {\n    return `\n      <div class=\"page-container\">\n        <div class=\"header-container\"></div>\n        <ul class=\"posts\">\n          <li class=\"post\" data-index=${index}>\n            <div class=\"post-header\" data-user-id=\"${element.userId}\">\n                <img src=\"${element.userImageUrl}\" class=\"post-header__user-image\">\n                <p class=\"post-header__user-name\">${element.userName}</p>\n            </div>\n            <div class=\"post-image-container\">\n              <img class=\"post-image\" src=\"${element.imageUrl}\">\n            </div>\n            <div class=\"post-likes\">\n              <button data-post-id=\"${element.id}\" data-like=\"${element.isLiked ? 'true' : ''}\" data-index=\"${index}\" class=\"like-button\">\n                <img src=\"${element.isLiked ? `./assets/images/like-active.svg` : `./assets/images/like-not-active.svg`}\">\n              </button>\n              <p class=\"post-likes-text\">\n              Нравится: <strong>${element.likes.length >= 1 ? element.likes[0].name : '0'}</strong> ${(element.likes.length - 1) > 0 ? 'и ещё' + ' ' + (element.likes.length - 1) : ''}\n              </p >\n            </div >\n            <p class=\"post-text\">\n              <span class=\"user-name\">${element.userName}</span>\n              ${element.description}\n            </p>\n            <p class=\"post-date\">\n              ${element.date} назад\n            </p>\n          </li >                  \n        </ul >\n      </div > `\n  });\n\n  appEl.innerHTML = postsHtml;\n\n  (0,_header_component_js__WEBPACK_IMPORTED_MODULE_1__.renderHeaderComponent)({\n    element: document.querySelector(\".header-container\"),\n  });\n\n  for (let userEl of document.querySelectorAll(\".post-header\")) {\n    userEl.addEventListener(\"click\", () => {\n      (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.goToPage)(_routes_js__WEBPACK_IMPORTED_MODULE_0__.USER_POSTS_PAGE, {\n        userId: userEl.dataset.userId,\n      });\n    });\n  }\n\n  const likeEventListener = () => {\n    const likeButtons = document.querySelectorAll(\".like-button\");\n\n    likeButtons.forEach(likeButton => {\n      likeButton.addEventListener(\"click\", (event) => {\n        event.stopPropagation();\n        const postId = likeButton.dataset.postId;\n        const index = likeButton.dataset.index;\n        likeButton.classList.add(\"shake-bottom\");\n\n        if (_main_js__WEBPACK_IMPORTED_MODULE_2__.posts[index].isLiked) {\n          (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.removeLike)({ token: (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.getToken)(), postId })\n            .then(() => {\n              _main_js__WEBPACK_IMPORTED_MODULE_2__.posts[index].isLiked = false;\n            })\n            .then(() => {\n              (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.getPosts)({ token: (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.getToken)() })\n                .then((response) => {\n                  (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.setPosts)(response);\n                  likeButton.classList.remove(\"shake-bottom\");\n                  (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.renderApp)();\n                })\n            })\n        } else {\n          (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.setLike)({ token: (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.getToken)(), postId })\n            .then(() => {\n              _main_js__WEBPACK_IMPORTED_MODULE_2__.posts[index].isLiked = true;\n            })\n            .then(() => {\n              (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.getPosts)({ token: (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.getToken)() })\n                .then((response) => {\n                  (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.setPosts)(response);\n                  likeButton.classList.remove(\"shake-bottom\");\n                  (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.renderApp)();\n                })\n            })\n        }\n      });\n    });\n  };\n\n  likeEventListener();\n}\n\n//# sourceURL=webpack://instapro/./components/posts-page-component.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderPostsPageComponent: () => (/* binding */ renderPostsPageComponent)\n/* harmony export */ });\n/* harmony import */ var _routes_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../routes.js */ \"./routes.js\");\n/* harmony import */ var _header_component_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./header-component.js */ \"./components/header-component.js\");\n/* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../index.js */ \"./index.js\");\n/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! date-fns */ \"./node_modules/date-fns/esm/formatDistanceToNow/index.js\");\n/* harmony import */ var date_fns_locale_ru__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! date-fns/locale/ru */ \"./node_modules/date-fns/esm/locale/ru/index.js\");\n/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api.js */ \"./api.js\");\n\n\n\n\n\n\nfunction createPostHtml(post, index, currentUserName) {\n  const likesNames = post.likes.map(like => like.name).join(\", \");\n  return `\n    <li class=\"post\">\n      <div class=\"post-header\" data-user-id=\"${post.user.id}\">\n        <img src=\"${post.user.imageUrl}\" class=\"post-header__user-image\">\n        <p class=\"post-header__user-name\">${post.user.name}</p>\n      </div>\n      <div class=\"post-image-container\">\n        <img class=\"post-image\" src=\"${post.imageUrl}\">\n      </div>\n      <div class=\"post-likes\">\n        <button data-post-id=\"${post.id}\" class=\"like-button\" data-index = ${index}>\n          <img src=\"${post.isLiked ? \"./assets/images/like-active.svg\" : \"./assets/images/like-not-active.svg\"}\">\n        </button>\n        <p class=\"post-likes-text\">\n        Нравится: <strong>${post.likes.length} (${likesNames})</strong>\n        </p>\n      </div>\n      <p class=\"post-text\">\n        <span class=\"user-name\">${post.user.name}</span>\n        ${post.description}\n      </p>\n      <p class=\"post-date\">\n        ${(0,date_fns__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(new Date(post.createdAt), {\n    locale: date_fns_locale_ru__WEBPACK_IMPORTED_MODULE_5__[\"default\"]\n  })} назад\n      </p>\n    </li>`;\n}\nfunction getPostHtmls(posts) {\n  return posts.map(createPostHtml).join(\"\");\n}\nfunction renderPostsPageComponent({\n  appEl,\n  posts,\n  userId,\n  token,\n  currentUserName\n}) {\n  console.log(\"Токен в renderPostsPageComponent:\", token);\n  console.log(\"Актуальный список постов:\", posts);\n  const postsHtml = getPostHtmls(posts);\n  const appHtml = `\n    <div class=\"page-container\">\n      <div class=\"header-container\"></div>\n      <ul class=\"posts\">\n        ${postsHtml}\n      </ul>\n    </div>`;\n  appEl.innerHTML = appHtml;\n  const like = (posts, token) => {\n    console.log(\"Токен в функции like:\", token);\n    const likeButtons = document.querySelectorAll(\".like-button\");\n    for (const like of likeButtons) {\n      like.addEventListener(\"click\", event => {\n        if (!token) {\n          alert(\"Вы должны войти в систему, чтобы ставить лайки\");\n          return;\n        }\n        event.stopPropagation();\n        const postIndex = parseInt(like.dataset.index, 10);\n        const post = posts[postIndex];\n        console.log(\"Current post object:\", post);\n        const postLikesText = like.closest(\".post-likes\").querySelector(\".post-likes-text strong\");\n\n        // При участии функции из апи\n\n        if (post.isLiked === false) {\n          (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.addLike)({\n            token,\n            id: post.id\n          }).then(() => {\n            post.isLiked = true;\n            like.querySelector(\"img\").src = \"./assets/images/like-active.svg\";\n            post.likes.push({\n              id: userId,\n              name: currentUserName\n            });\n            postLikesText.textContent = `${post.likes.length} (${currentUserName})`;\n          }).catch(error => {\n            console.error(\"Ошибка при добавлении лайка:\", error);\n          });\n        } else if (post.isLiked === true) {\n          (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.disLike)({\n            token,\n            id: post.id\n          }).then(() => {\n            post.isLiked = false;\n            like.querySelector(\"img\").src = \"./assets/images/like-not-active.svg\";\n            post.likes = post.likes.filter(like => like.name !== currentUserName);\n            postLikesText.textContent = post.likes.length;\n          }).catch(error => {\n            console.error(\"Ошибка при удалении лайка:\", error);\n          });\n        }\n      });\n    }\n  };\n  like(posts, token);\n  (0,_header_component_js__WEBPACK_IMPORTED_MODULE_1__.renderHeaderComponent)({\n    element: document.querySelector(\".header-container\")\n  });\n  for (let userEl of document.querySelectorAll(\".post-header\")) {\n    userEl.addEventListener(\"click\", () => {\n      (0,_index_js__WEBPACK_IMPORTED_MODULE_2__.goToPage)(_routes_js__WEBPACK_IMPORTED_MODULE_0__.USER_POSTS_PAGE, {\n        userId: userEl.dataset.userId\n      });\n    });\n  }\n}\n\n//# sourceURL=webpack://instapro/./components/posts-page-component.js?");
 
 /***/ }),
 
@@ -76,17 +76,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \**********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderUploadImageComponent: () => (/* binding */ renderUploadImageComponent)\n/* harmony export */ });\n/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api.js */ \"./api.js\");\n\n\nfunction renderUploadImageComponent({ element, onImageUrlChange }) {\n  let imageUrl = \"\";\n\n  const render = () => {\n    element.innerHTML = `\n  <div class=\"upload=image\">\n      ${\n        imageUrl\n          ? `\n          <div class=\"file-upload-image-conrainer\">\n            <img class=\"file-upload-image\" src=\"${imageUrl}\">\n            <button class=\"file-upload-remove-button button\">Заменить фото</button>\n          </div>\n          `\n          : `\n            <label class=\"file-upload-label secondary-button\">\n                <input\n                  type=\"file\"\n                  class=\"file-upload-input\"\n                  style=\"display:none\"\n                />\n                Выберите фото\n            </label>\n          \n      `\n      }\n  </div>\n`;\n\n    const fileInputElement = element.querySelector(\".file-upload-input\");\n\n    fileInputElement?.addEventListener(\"change\", () => {\n      const file = fileInputElement.files[0];\n      if (file) {\n        const lableEl = document.querySelector(\".file-upload-label\");\n        lableEl.setAttribute(\"disabled\", true);\n        lableEl.textContent = \"Загружаю файл...\";\n        (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.uploadImage)({ file }).then(({ fileUrl }) => {\n          imageUrl = fileUrl;\n          onImageUrlChange(imageUrl);\n          render();\n        });\n      }\n    });\n\n    element\n      .querySelector(\".file-upload-remove-button\")\n      ?.addEventListener(\"click\", () => {\n        imageUrl = \"\";\n        onImageUrlChange(imageUrl);\n        render();\n      });\n  };\n\n  render();\n}\n\n\n//# sourceURL=webpack://instapro/./components/upload-image-component.js?");
-
-/***/ }),
-
-/***/ "./components/user-posts-page-component.js":
-/*!*************************************************!*\
-  !*** ./components/user-posts-page-component.js ***!
-  \*************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderUserPostsPageComponent: () => (/* binding */ renderUserPostsPageComponent)\n/* harmony export */ });\n/* harmony import */ var _routes_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../routes.js */ \"./routes.js\");\n/* harmony import */ var _header_component_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./header-component.js */ \"./components/header-component.js\");\n/* harmony import */ var _main_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../main.js */ \"./main.js\");\n/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! date-fns */ \"./node_modules/date-fns/esm/formatDistanceToNow/index.js\");\n/* harmony import */ var date_fns_locale__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! date-fns/locale */ \"./node_modules/date-fns/esm/locale/ru/index.js\");\n/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../api.js */ \"./api.js\");\n\n\n\n\n\n\n\nfunction renderUserPostsPageComponent({ appEl }) {\n\n  const appPosts = _main_js__WEBPACK_IMPORTED_MODULE_2__.posts.map((post) => {\n    return {\n      userImageUrl: post.user.imageUrl,\n      userName: post.user.name,\n      userId: post.user.id,\n      imageUrl: post.imageUrl,\n      description: post.description,\n      userLogin: post.user.login,\n      date: (0,date_fns__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(new Date(post.createdAt), { locale: date_fns_locale__WEBPACK_IMPORTED_MODULE_5__[\"default\"] }),\n      likes: post.likes,\n      isLiked: post.isLiked,\n      id: post.id,\n    }\n  })\n\n  const postsHtml = appPosts.map((element, index) => {\n    return `\n        <div class=\"page-container\">\n          <div class=\"header-container\"></div>\n          <ul class=\"posts\">\n            <li class=\"post\" data-index=${index}>\n              <div class=\"post-header\" data-user-id=\"${element.userId}\">\n                  <img src=\"${element.userImageUrl}\" class=\"post-header__user-image\">\n                  <p class=\"post-header__user-name\">${element.userName}</p>\n              </div>\n              <div class=\"post-image-container\">\n                <img class=\"post-image\" src=\"${element.imageUrl}\">\n              </div>\n              <div class=\"post-likes\">\n                <button data-post-id=\"${element.id}\" data-like=\"${element.isLiked ? 'true' : ''}\" data-index=\"${index}\" class=\"like-button\">\n                  <img src=\"${element.isLiked ? `./assets/images/like-active.svg` : `./assets/images/like-not-active.svg`}\">\n                </button>\n                <p class=\"post-likes-text\">\n                Нравится: <strong>${element.likes.length >= 1 ? element.likes[0].name : '0'}</strong> ${(element.likes.length - 1) > 0 ? 'и ещё' + ' ' + (element.likes.length - 1) : ''}\n                </p>\n              </div>\n              <p class=\"post-text\">\n                <span class=\"user-name\">${element.userName}</span>\n                ${element.description}\n              </p>\n              <p class=\"post-date\">\n              ${element.date} назад\n              </p>\n            </li>                  \n          </ul>\n        </div>`\n  });\n\n  appEl.innerHTML = postsHtml;\n\n  (0,_header_component_js__WEBPACK_IMPORTED_MODULE_1__.renderHeaderComponent)({\n    element: document.querySelector(\".header-container\"),\n  });\n\n  for (let userEl of document.querySelectorAll(\".post-header\")) {\n    userEl.addEventListener(\"click\", () => {\n      (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.goToPage)(_routes_js__WEBPACK_IMPORTED_MODULE_0__.USER_POSTS_PAGE, {\n        userId: userEl.dataset.userId,\n      });\n    });\n  }\n\n  const likeEventListener = () => {\n    const likeButtons = document.querySelectorAll(\".like-button\");\n\n    likeButtons.forEach(likeButton => {\n      likeButton.addEventListener(\"click\", (event) => {\n        event.stopPropagation();\n        const postId = likeButton.dataset.postId;\n        const index = likeButton.dataset.index;\n        const postHeader = document.querySelector('.post-header');\n        const userId = postHeader.dataset.userId;\n        likeButton.classList.add(\"shake-bottom\");\n\n        if (_main_js__WEBPACK_IMPORTED_MODULE_2__.posts[index].isLiked) {\n          (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.removeLike)({ token: (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.getToken)(), postId })\n            .then(() => {\n              _main_js__WEBPACK_IMPORTED_MODULE_2__.posts[index].isLiked = false;\n            })\n            .then(() => {\n              (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.getUserPosts)({ token: (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.getToken)(), userId })\n                .then((response) => {\n                  (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.setPosts)(response);\n                  likeButton.classList.remove(\"shake-bottom\");\n                  (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.renderApp)();\n                })\n            })\n        } else {\n          (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.setLike)({ token: (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.getToken)(), postId })\n            .then(() => {\n              _main_js__WEBPACK_IMPORTED_MODULE_2__.posts[index].isLiked = true;\n            })\n            .then(() => {\n              (0,_api_js__WEBPACK_IMPORTED_MODULE_3__.getUserPosts)({ token: (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.getToken)(), userId })\n                .then((response) => {\n                  (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.setPosts)(response);\n                  likeButton.classList.remove(\"shake-bottom\");\n                  (0,_main_js__WEBPACK_IMPORTED_MODULE_2__.renderApp)();\n                })\n            })\n        }\n      });\n    });\n  };\n\n  likeEventListener();\n}\n\n//# sourceURL=webpack://instapro/./components/user-posts-page-component.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   renderUploadImageComponent: () => (/* binding */ renderUploadImageComponent)\n/* harmony export */ });\n/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../api.js */ \"./api.js\");\n\nfunction renderUploadImageComponent({\n  element,\n  onImageUrlChange\n}) {\n  let imageUrl = \"\";\n  const render = () => {\n    element.innerHTML = `\n  <div class=\"upload=image\">\n      ${imageUrl ? `\n          <div class=\"file-upload-image-conrainer\">\n            <img class=\"file-upload-image\" src=\"${imageUrl}\">\n            <button class=\"file-upload-remove-button button\">Заменить фото</button>\n          </div>\n          ` : `\n            <label class=\"file-upload-label secondary-button\">\n                <input\n                  type=\"file\"\n                  class=\"file-upload-input\"\n                  style=\"display:none\"\n                />\n                Выберите фото\n            </label>\n          \n      `}\n  </div>\n`;\n    const fileInputElement = element.querySelector(\".file-upload-input\");\n    fileInputElement?.addEventListener(\"change\", () => {\n      const file = fileInputElement.files[0];\n      if (file) {\n        const lableEl = document.querySelector(\".file-upload-label\");\n        lableEl.setAttribute(\"disabled\", true);\n        lableEl.textContent = \"Загружаю файл...\";\n        (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.uploadImage)({\n          file\n        }).then(({\n          fileUrl\n        }) => {\n          imageUrl = fileUrl;\n          onImageUrlChange(imageUrl);\n          render();\n        });\n      }\n    });\n    element.querySelector(\".file-upload-remove-button\")?.addEventListener(\"click\", () => {\n      imageUrl = \"\";\n      onImageUrlChange(imageUrl);\n      render();\n    });\n  };\n  render();\n}\n\n//# sourceURL=webpack://instapro/./components/upload-image-component.js?");
 
 /***/ }),
 
@@ -96,17 +86,27 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \********************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   getUserFromLocalStorage: () => (/* binding */ getUserFromLocalStorage),\n/* harmony export */   removeUserFromLocalStorage: () => (/* binding */ removeUserFromLocalStorage),\n/* harmony export */   saveUserToLocalStorage: () => (/* binding */ saveUserToLocalStorage)\n/* harmony export */ });\nfunction saveUserToLocalStorage(user) {\n  window.localStorage.setItem(\"user\", JSON.stringify(user));\n}\n\nfunction getUserFromLocalStorage(user) {\n  try {\n    return JSON.parse(window.localStorage.getItem(\"user\"));\n  } catch (error) {\n    return null;\n  }\n}\n\nfunction removeUserFromLocalStorage(user) {\n  window.localStorage.removeItem(\"user\");\n}\n\n\n//# sourceURL=webpack://instapro/./helpers.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   getUserFromLocalStorage: () => (/* binding */ getUserFromLocalStorage),\n/* harmony export */   removeUserFromLocalStorage: () => (/* binding */ removeUserFromLocalStorage),\n/* harmony export */   saveUserToLocalStorage: () => (/* binding */ saveUserToLocalStorage)\n/* harmony export */ });\nfunction saveUserToLocalStorage(user) {\n  window.localStorage.setItem(\"user\", JSON.stringify(user));\n}\nfunction getUserFromLocalStorage(user) {\n  try {\n    return JSON.parse(window.localStorage.getItem(\"user\"));\n  } catch (error) {\n    return null;\n  }\n}\nfunction removeUserFromLocalStorage(user) {\n  window.localStorage.removeItem(\"user\");\n}\n\n//# sourceURL=webpack://instapro/./helpers.js?");
 
 /***/ }),
 
-/***/ "./main.js":
-/*!*****************!*\
-  !*** ./main.js ***!
-  \*****************/
+/***/ "./index.js":
+/*!******************!*\
+  !*** ./index.js ***!
+  \******************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   getToken: () => (/* binding */ getToken),\n/* harmony export */   goToPage: () => (/* binding */ goToPage),\n/* harmony export */   logout: () => (/* binding */ logout),\n/* harmony export */   page: () => (/* binding */ page),\n/* harmony export */   posts: () => (/* binding */ posts),\n/* harmony export */   renderApp: () => (/* binding */ renderApp),\n/* harmony export */   setPosts: () => (/* binding */ setPosts),\n/* harmony export */   user: () => (/* binding */ user)\n/* harmony export */ });\n/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api.js */ \"./api.js\");\n/* harmony import */ var _components_add_post_page_component_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/add-post-page-component.js */ \"./components/add-post-page-component.js\");\n/* harmony import */ var _components_auth_page_component_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/auth-page-component.js */ \"./components/auth-page-component.js\");\n/* harmony import */ var _routes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./routes.js */ \"./routes.js\");\n/* harmony import */ var _components_posts_page_component_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/posts-page-component.js */ \"./components/posts-page-component.js\");\n/* harmony import */ var _components_user_posts_page_component_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/user-posts-page-component.js */ \"./components/user-posts-page-component.js\");\n/* harmony import */ var _components_loading_page_component_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/loading-page-component.js */ \"./components/loading-page-component.js\");\n/* harmony import */ var _helpers_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./helpers.js */ \"./helpers.js\");\n\n\n\n\n\n\n\n\n\nlet user = (0,_helpers_js__WEBPACK_IMPORTED_MODULE_7__.getUserFromLocalStorage)();\nlet page = null;\nlet posts = [];\nconst setPosts = (newPosts) => {\n  posts = newPosts;\n}\n\nconst getToken = () => {\n  const token = user ? `Bearer ${user.token}` : undefined;\n  return token;\n};\n\nconst logout = () => {\n  user = null;\n  (0,_helpers_js__WEBPACK_IMPORTED_MODULE_7__.removeUserFromLocalStorage)();\n  goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n};\n\nconst goToPage = (newPage, data) => {\n  if (\n    [\n      _routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE,\n      _routes_js__WEBPACK_IMPORTED_MODULE_3__.AUTH_PAGE,\n      _routes_js__WEBPACK_IMPORTED_MODULE_3__.ADD_POSTS_PAGE,\n      _routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE,\n      _routes_js__WEBPACK_IMPORTED_MODULE_3__.LOADING_PAGE,\n    ].includes(newPage)\n  ) {\n    if (newPage === _routes_js__WEBPACK_IMPORTED_MODULE_3__.ADD_POSTS_PAGE) {\n      page = user ? _routes_js__WEBPACK_IMPORTED_MODULE_3__.ADD_POSTS_PAGE : _routes_js__WEBPACK_IMPORTED_MODULE_3__.AUTH_PAGE;\n      return renderApp();\n    }\n\n    if (newPage === _routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE) {\n      page = _routes_js__WEBPACK_IMPORTED_MODULE_3__.LOADING_PAGE;\n      renderApp();\n\n      return (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.getPosts)({ token: getToken() })\n        .then((newPosts) => {\n          page = _routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE;\n          posts = newPosts;\n          renderApp();\n        })\n        .catch((error) => {\n          console.error(error);\n          goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n        });\n    }\n\n    if (newPage === _routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE) {\n      let userId = data.userId;\n\n      return (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.getUserPosts)({ token: getToken(), userId })\n        .then((newUserPosts) => {\n          page = _routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE;\n          posts = newUserPosts;\n          renderApp();\n        })\n        .catch((error) => {\n          console.error(error);\n          goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE);\n        });\n    }\n\n    page = newPage;\n    renderApp();\n\n    return;\n  }\n\n  throw new Error(\"страницы не существует\");\n};\n\nconst renderApp = () => {\n  const appEl = document.getElementById(\"app\");\n  if (page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.LOADING_PAGE) {\n    return (0,_components_loading_page_component_js__WEBPACK_IMPORTED_MODULE_6__.renderLoadingPageComponent)({\n      appEl,\n      user,\n      goToPage,\n    });\n  }\n\n  if (page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.AUTH_PAGE) {\n    return (0,_components_auth_page_component_js__WEBPACK_IMPORTED_MODULE_2__.renderAuthPageComponent)({\n      appEl,\n      setUser: (newUser) => {\n        user = newUser;\n        (0,_helpers_js__WEBPACK_IMPORTED_MODULE_7__.saveUserToLocalStorage)(user);\n        goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n      },\n      user,\n      goToPage,\n    });\n  }\n\n  if (page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.ADD_POSTS_PAGE) {\n    return (0,_components_add_post_page_component_js__WEBPACK_IMPORTED_MODULE_1__.renderAddPostPageComponent)({\n      appEl,\n      onAddPostClick({ description, imageUrl }) {\n        (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.addPost)({\n          token: getToken(),\n          description,\n          imageUrl,\n        })\n          .then((responseData) => {\n            console.log(responseData);\n            (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.getPosts)({ token: getToken() })\n              .then((response) => {\n                posts = response;\n                renderApp();\n              })\n          });\n\n        goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n      },\n    });\n  }\n\n  if (page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE) {\n    return (0,_components_posts_page_component_js__WEBPACK_IMPORTED_MODULE_4__.renderPostsPageComponent)({\n      appEl,\n    });\n  }\n\n  if (page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE) {\n    return (0,_components_user_posts_page_component_js__WEBPACK_IMPORTED_MODULE_5__.renderUserPostsPageComponent)({\n      appEl,\n    });\n  }\n};\n\ngoToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n\n\n//# sourceURL=webpack://instapro/./main.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   currentUserId: () => (/* binding */ currentUserId),\n/* harmony export */   getToken: () => (/* binding */ getToken),\n/* harmony export */   goToPage: () => (/* binding */ goToPage),\n/* harmony export */   logout: () => (/* binding */ logout),\n/* harmony export */   page: () => (/* binding */ page),\n/* harmony export */   posts: () => (/* binding */ posts),\n/* harmony export */   renderApp: () => (/* binding */ renderApp),\n/* harmony export */   updatePostsAndGoToPostsPage: () => (/* binding */ updatePostsAndGoToPostsPage),\n/* harmony export */   user: () => (/* binding */ user)\n/* harmony export */ });\n/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api.js */ \"./api.js\");\n/* harmony import */ var _components_add_post_page_component_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/add-post-page-component.js */ \"./components/add-post-page-component.js\");\n/* harmony import */ var _components_auth_page_component_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/auth-page-component.js */ \"./components/auth-page-component.js\");\n/* harmony import */ var _routes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./routes.js */ \"./routes.js\");\n/* harmony import */ var _components_posts_page_component_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/posts-page-component.js */ \"./components/posts-page-component.js\");\n/* harmony import */ var _components_loading_page_component_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/loading-page-component.js */ \"./components/loading-page-component.js\");\n/* harmony import */ var _helpers_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./helpers.js */ \"./helpers.js\");\n\n\n\n\n\n\n\nlet user = (0,_helpers_js__WEBPACK_IMPORTED_MODULE_6__.getUserFromLocalStorage)();\nlet page = null;\nlet posts = [];\nlet currentUserId = null; //НОВОЕ\n\nconst getToken = () => {\n  const token = user ? `Bearer ${user.token}` : undefined;\n  return token;\n};\nconst logout = () => {\n  user = null;\n  (0,_helpers_js__WEBPACK_IMPORTED_MODULE_6__.removeUserFromLocalStorage)();\n  goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n};\nconst updatePostsAndGoToPostsPage = () => {\n  page = _routes_js__WEBPACK_IMPORTED_MODULE_3__.LOADING_PAGE;\n  renderApp();\n  return (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.getPosts)({\n    token: getToken()\n  }).then(newPosts => {\n    page = _routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE;\n    posts = newPosts;\n    renderApp();\n  }).catch(error => {\n    console.error(error);\n    goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n  });\n};\nconst goToPage = (newPage, data) => {\n  if ([_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE, _routes_js__WEBPACK_IMPORTED_MODULE_3__.AUTH_PAGE, _routes_js__WEBPACK_IMPORTED_MODULE_3__.ADD_POSTS_PAGE, _routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE, _routes_js__WEBPACK_IMPORTED_MODULE_3__.LOADING_PAGE].includes(newPage)) {\n    if (newPage === _routes_js__WEBPACK_IMPORTED_MODULE_3__.ADD_POSTS_PAGE) {\n      // Если пользователь не авторизован, то отправляем его на авторизацию перед добавлением поста\n      page = user ? _routes_js__WEBPACK_IMPORTED_MODULE_3__.ADD_POSTS_PAGE : _routes_js__WEBPACK_IMPORTED_MODULE_3__.AUTH_PAGE;\n      return renderApp();\n    }\n    if (newPage === _routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE) {\n      page = _routes_js__WEBPACK_IMPORTED_MODULE_3__.LOADING_PAGE;\n      renderApp();\n      return (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.getPosts)({\n        token: getToken()\n      }).then(newPosts => {\n        page = _routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE;\n        posts = newPosts;\n        renderApp();\n      }).catch(error => {\n        console.error(error);\n        goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n      });\n    }\n    if (newPage === _routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE) {\n      page = _routes_js__WEBPACK_IMPORTED_MODULE_3__.LOADING_PAGE;\n      renderApp();\n      currentUserId = data.userId;\n      return (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.getPostsByUser)({\n        token: getToken(),\n        id: data.userId\n      }).then(newPosts => {\n        console.log(\"Posts returned by getPostsByUser:\", newPosts);\n        page = _routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE;\n        posts = newPosts.posts;\n        renderApp();\n      }).catch(error => {\n        console.error(error);\n        goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n      });\n    }\n    page = newPage;\n    renderApp();\n    return;\n  }\n  throw new Error(\"страницы не существует\");\n};\nconst renderApp = () => {\n  const appEl = document.getElementById(\"app\");\n  const currentUserName = user ? user.name : null;\n  if (page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.LOADING_PAGE) {\n    return (0,_components_loading_page_component_js__WEBPACK_IMPORTED_MODULE_5__.renderLoadingPageComponent)({\n      appEl,\n      user,\n      goToPage\n    });\n  }\n  if (page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.AUTH_PAGE) {\n    return (0,_components_auth_page_component_js__WEBPACK_IMPORTED_MODULE_2__.renderAuthPageComponent)({\n      appEl,\n      setUser: newUser => {\n        user = newUser;\n        (0,_helpers_js__WEBPACK_IMPORTED_MODULE_6__.saveUserToLocalStorage)(user);\n        goToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n      },\n      user,\n      goToPage\n    });\n  }\n  if (page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.ADD_POSTS_PAGE) {\n    return (0,_components_add_post_page_component_js__WEBPACK_IMPORTED_MODULE_1__.renderAddPostPageComponent)({\n      appEl,\n      onAddPostClick({\n        description,\n        imageUrl\n      }) {\n        (0,_api_js__WEBPACK_IMPORTED_MODULE_0__.createPost)({\n          token: getToken(),\n          description,\n          imageUrl\n        }).then(post => {\n          console.log(\"Добавленный пост:\", post);\n          updatePostsAndGoToPostsPage();\n        }).catch(error => {\n          console.error(\"Ошибка при добавлении поста:\", error);\n        });\n      }\n    });\n  }\n  if (page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE || page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE) {\n    return (0,_components_posts_page_component_js__WEBPACK_IMPORTED_MODULE_4__.renderPostsPageComponent)({\n      appEl,\n      posts,\n      userId: page === _routes_js__WEBPACK_IMPORTED_MODULE_3__.USER_POSTS_PAGE ? currentUserId : null,\n      token: getToken(),\n      currentUserName\n    });\n  }\n};\ngoToPage(_routes_js__WEBPACK_IMPORTED_MODULE_3__.POSTS_PAGE);\n\n//# sourceURL=webpack://instapro/./index.js?");
+
+/***/ }),
+
+/***/ "./routes.js":
+/*!*******************!*\
+  !*** ./routes.js ***!
+  \*******************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   ADD_POSTS_PAGE: () => (/* binding */ ADD_POSTS_PAGE),\n/* harmony export */   AUTH_PAGE: () => (/* binding */ AUTH_PAGE),\n/* harmony export */   LOADING_PAGE: () => (/* binding */ LOADING_PAGE),\n/* harmony export */   POSTS_PAGE: () => (/* binding */ POSTS_PAGE),\n/* harmony export */   USER_POSTS_PAGE: () => (/* binding */ USER_POSTS_PAGE)\n/* harmony export */ });\n// Файл со списком страниц приложения\nconst POSTS_PAGE = \"posts\";\nconst USER_POSTS_PAGE = \"user-posts\";\nconst AUTH_PAGE = \"auth\";\nconst ADD_POSTS_PAGE = \"add-post\";\nconst LOADING_PAGE = \"loading\";\n\n//# sourceURL=webpack://instapro/./routes.js?");
 
 /***/ }),
 
@@ -280,16 +280,6 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
-/***/ "./node_modules/date-fns/esm/formatDistance/index.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/date-fns/esm/formatDistance/index.js ***!
-  \***********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ formatDistance)\n/* harmony export */ });\n/* harmony import */ var _lib_defaultOptions_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../_lib/defaultOptions/index.js */ \"./node_modules/date-fns/esm/_lib/defaultOptions/index.js\");\n/* harmony import */ var _compareAsc_index_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../compareAsc/index.js */ \"./node_modules/date-fns/esm/compareAsc/index.js\");\n/* harmony import */ var _differenceInMonths_index_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../differenceInMonths/index.js */ \"./node_modules/date-fns/esm/differenceInMonths/index.js\");\n/* harmony import */ var _differenceInSeconds_index_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../differenceInSeconds/index.js */ \"./node_modules/date-fns/esm/differenceInSeconds/index.js\");\n/* harmony import */ var _lib_defaultLocale_index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../_lib/defaultLocale/index.js */ \"./node_modules/date-fns/esm/_lib/defaultLocale/index.js\");\n/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../toDate/index.js */ \"./node_modules/date-fns/esm/toDate/index.js\");\n/* harmony import */ var _lib_cloneObject_index_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../_lib/cloneObject/index.js */ \"./node_modules/date-fns/esm/_lib/cloneObject/index.js\");\n/* harmony import */ var _lib_assign_index_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../_lib/assign/index.js */ \"./node_modules/date-fns/esm/_lib/assign/index.js\");\n/* harmony import */ var _lib_getTimezoneOffsetInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../_lib/getTimezoneOffsetInMilliseconds/index.js */ \"./node_modules/date-fns/esm/_lib/getTimezoneOffsetInMilliseconds/index.js\");\n/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ \"./node_modules/date-fns/esm/_lib/requiredArgs/index.js\");\n\n\n\n\n\n\n\n\n\n\nvar MINUTES_IN_DAY = 1440;\nvar MINUTES_IN_ALMOST_TWO_DAYS = 2520;\nvar MINUTES_IN_MONTH = 43200;\nvar MINUTES_IN_TWO_MONTHS = 86400;\n\n/**\n * @name formatDistance\n * @category Common Helpers\n * @summary Return the distance between the given dates in words.\n *\n * @description\n * Return the distance between the given dates in words.\n *\n * | Distance between dates                                            | Result              |\n * |-------------------------------------------------------------------|---------------------|\n * | 0 ... 30 secs                                                     | less than a minute  |\n * | 30 secs ... 1 min 30 secs                                         | 1 minute            |\n * | 1 min 30 secs ... 44 mins 30 secs                                 | [2..44] minutes     |\n * | 44 mins ... 30 secs ... 89 mins 30 secs                           | about 1 hour        |\n * | 89 mins 30 secs ... 23 hrs 59 mins 30 secs                        | about [2..24] hours |\n * | 23 hrs 59 mins 30 secs ... 41 hrs 59 mins 30 secs                 | 1 day               |\n * | 41 hrs 59 mins 30 secs ... 29 days 23 hrs 59 mins 30 secs         | [2..30] days        |\n * | 29 days 23 hrs 59 mins 30 secs ... 44 days 23 hrs 59 mins 30 secs | about 1 month       |\n * | 44 days 23 hrs 59 mins 30 secs ... 59 days 23 hrs 59 mins 30 secs | about 2 months      |\n * | 59 days 23 hrs 59 mins 30 secs ... 1 yr                           | [2..12] months      |\n * | 1 yr ... 1 yr 3 months                                            | about 1 year        |\n * | 1 yr 3 months ... 1 yr 9 month s                                  | over 1 year         |\n * | 1 yr 9 months ... 2 yrs                                           | almost 2 years      |\n * | N yrs ... N yrs 3 months                                          | about N years       |\n * | N yrs 3 months ... N yrs 9 months                                 | over N years        |\n * | N yrs 9 months ... N+1 yrs                                        | almost N+1 years    |\n *\n * With `options.includeSeconds == true`:\n * | Distance between dates | Result               |\n * |------------------------|----------------------|\n * | 0 secs ... 5 secs      | less than 5 seconds  |\n * | 5 secs ... 10 secs     | less than 10 seconds |\n * | 10 secs ... 20 secs    | less than 20 seconds |\n * | 20 secs ... 40 secs    | half a minute        |\n * | 40 secs ... 60 secs    | less than a minute   |\n * | 60 secs ... 90 secs    | 1 minute             |\n *\n * @param {Date|Number} date - the date\n * @param {Date|Number} baseDate - the date to compare with\n * @param {Object} [options] - an object with options.\n * @param {Boolean} [options.includeSeconds=false] - distances less than a minute are more detailed\n * @param {Boolean} [options.addSuffix=false] - result indicates if the second date is earlier or later than the first\n * @param {Locale} [options.locale=defaultLocale] - the locale object. See [Locale]{@link https://date-fns.org/docs/Locale}\n * @returns {String} the distance in words\n * @throws {TypeError} 2 arguments required\n * @throws {RangeError} `date` must not be Invalid Date\n * @throws {RangeError} `baseDate` must not be Invalid Date\n * @throws {RangeError} `options.locale` must contain `formatDistance` property\n *\n * @example\n * // What is the distance between 2 July 2014 and 1 January 2015?\n * const result = formatDistance(new Date(2014, 6, 2), new Date(2015, 0, 1))\n * //=> '6 months'\n *\n * @example\n * // What is the distance between 1 January 2015 00:00:15\n * // and 1 January 2015 00:00:00, including seconds?\n * const result = formatDistance(\n *   new Date(2015, 0, 1, 0, 0, 15),\n *   new Date(2015, 0, 1, 0, 0, 0),\n *   { includeSeconds: true }\n * )\n * //=> 'less than 20 seconds'\n *\n * @example\n * // What is the distance from 1 January 2016\n * // to 1 January 2015, with a suffix?\n * const result = formatDistance(new Date(2015, 0, 1), new Date(2016, 0, 1), {\n *   addSuffix: true\n * })\n * //=> 'about 1 year ago'\n *\n * @example\n * // What is the distance between 1 August 2016 and 1 January 2015 in Esperanto?\n * import { eoLocale } from 'date-fns/locale/eo'\n * const result = formatDistance(new Date(2016, 7, 1), new Date(2015, 0, 1), {\n *   locale: eoLocale\n * })\n * //=> 'pli ol 1 jaro'\n */\n\nfunction formatDistance(dirtyDate, dirtyBaseDate, options) {\n  var _ref, _options$locale;\n  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(2, arguments);\n  var defaultOptions = (0,_lib_defaultOptions_index_js__WEBPACK_IMPORTED_MODULE_1__.getDefaultOptions)();\n  var locale = (_ref = (_options$locale = options === null || options === void 0 ? void 0 : options.locale) !== null && _options$locale !== void 0 ? _options$locale : defaultOptions.locale) !== null && _ref !== void 0 ? _ref : _lib_defaultLocale_index_js__WEBPACK_IMPORTED_MODULE_2__[\"default\"];\n  if (!locale.formatDistance) {\n    throw new RangeError('locale must contain formatDistance property');\n  }\n  var comparison = (0,_compareAsc_index_js__WEBPACK_IMPORTED_MODULE_3__[\"default\"])(dirtyDate, dirtyBaseDate);\n  if (isNaN(comparison)) {\n    throw new RangeError('Invalid time value');\n  }\n  var localizeOptions = (0,_lib_assign_index_js__WEBPACK_IMPORTED_MODULE_4__[\"default\"])((0,_lib_cloneObject_index_js__WEBPACK_IMPORTED_MODULE_5__[\"default\"])(options), {\n    addSuffix: Boolean(options === null || options === void 0 ? void 0 : options.addSuffix),\n    comparison: comparison\n  });\n  var dateLeft;\n  var dateRight;\n  if (comparison > 0) {\n    dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(dirtyBaseDate);\n    dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(dirtyDate);\n  } else {\n    dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(dirtyDate);\n    dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(dirtyBaseDate);\n  }\n  var seconds = (0,_differenceInSeconds_index_js__WEBPACK_IMPORTED_MODULE_7__[\"default\"])(dateRight, dateLeft);\n  var offsetInSeconds = ((0,_lib_getTimezoneOffsetInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_8__[\"default\"])(dateRight) - (0,_lib_getTimezoneOffsetInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_8__[\"default\"])(dateLeft)) / 1000;\n  var minutes = Math.round((seconds - offsetInSeconds) / 60);\n  var months;\n\n  // 0 up to 2 mins\n  if (minutes < 2) {\n    if (options !== null && options !== void 0 && options.includeSeconds) {\n      if (seconds < 5) {\n        return locale.formatDistance('lessThanXSeconds', 5, localizeOptions);\n      } else if (seconds < 10) {\n        return locale.formatDistance('lessThanXSeconds', 10, localizeOptions);\n      } else if (seconds < 20) {\n        return locale.formatDistance('lessThanXSeconds', 20, localizeOptions);\n      } else if (seconds < 40) {\n        return locale.formatDistance('halfAMinute', 0, localizeOptions);\n      } else if (seconds < 60) {\n        return locale.formatDistance('lessThanXMinutes', 1, localizeOptions);\n      } else {\n        return locale.formatDistance('xMinutes', 1, localizeOptions);\n      }\n    } else {\n      if (minutes === 0) {\n        return locale.formatDistance('lessThanXMinutes', 1, localizeOptions);\n      } else {\n        return locale.formatDistance('xMinutes', minutes, localizeOptions);\n      }\n    }\n\n    // 2 mins up to 0.75 hrs\n  } else if (minutes < 45) {\n    return locale.formatDistance('xMinutes', minutes, localizeOptions);\n\n    // 0.75 hrs up to 1.5 hrs\n  } else if (minutes < 90) {\n    return locale.formatDistance('aboutXHours', 1, localizeOptions);\n\n    // 1.5 hrs up to 24 hrs\n  } else if (minutes < MINUTES_IN_DAY) {\n    var hours = Math.round(minutes / 60);\n    return locale.formatDistance('aboutXHours', hours, localizeOptions);\n\n    // 1 day up to 1.75 days\n  } else if (minutes < MINUTES_IN_ALMOST_TWO_DAYS) {\n    return locale.formatDistance('xDays', 1, localizeOptions);\n\n    // 1.75 days up to 30 days\n  } else if (minutes < MINUTES_IN_MONTH) {\n    var days = Math.round(minutes / MINUTES_IN_DAY);\n    return locale.formatDistance('xDays', days, localizeOptions);\n\n    // 1 month up to 2 months\n  } else if (minutes < MINUTES_IN_TWO_MONTHS) {\n    months = Math.round(minutes / MINUTES_IN_MONTH);\n    return locale.formatDistance('aboutXMonths', months, localizeOptions);\n  }\n  months = (0,_differenceInMonths_index_js__WEBPACK_IMPORTED_MODULE_9__[\"default\"])(dateRight, dateLeft);\n\n  // 2 months up to 12 months\n  if (months < 12) {\n    var nearestMonth = Math.round(minutes / MINUTES_IN_MONTH);\n    return locale.formatDistance('xMonths', nearestMonth, localizeOptions);\n\n    // 1 year up to max Date\n  } else {\n    var monthsSinceStartOfYear = months % 12;\n    var years = Math.floor(months / 12);\n\n    // N years up to 1 years 3 months\n    if (monthsSinceStartOfYear < 3) {\n      return locale.formatDistance('aboutXYears', years, localizeOptions);\n\n      // N years 3 months up to N years 9 months\n    } else if (monthsSinceStartOfYear < 9) {\n      return locale.formatDistance('overXYears', years, localizeOptions);\n\n      // N years 9 months up to N year 12 months\n    } else {\n      return locale.formatDistance('almostXYears', years + 1, localizeOptions);\n    }\n  }\n}\n\n//# sourceURL=webpack://instapro/./node_modules/date-fns/esm/formatDistance/index.js?");
-
-/***/ }),
-
 /***/ "./node_modules/date-fns/esm/formatDistanceToNow/index.js":
 /*!****************************************************************!*\
   !*** ./node_modules/date-fns/esm/formatDistanceToNow/index.js ***!
@@ -297,6 +287,16 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ formatDistanceToNow)\n/* harmony export */ });\n/* harmony import */ var _formatDistance_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../formatDistance/index.js */ \"./node_modules/date-fns/esm/formatDistance/index.js\");\n/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ \"./node_modules/date-fns/esm/_lib/requiredArgs/index.js\");\n\n\n/**\n * @name formatDistanceToNow\n * @category Common Helpers\n * @summary Return the distance between the given date and now in words.\n * @pure false\n *\n * @description\n * Return the distance between the given date and now in words.\n *\n * | Distance to now                                                   | Result              |\n * |-------------------------------------------------------------------|---------------------|\n * | 0 ... 30 secs                                                     | less than a minute  |\n * | 30 secs ... 1 min 30 secs                                         | 1 minute            |\n * | 1 min 30 secs ... 44 mins 30 secs                                 | [2..44] minutes     |\n * | 44 mins ... 30 secs ... 89 mins 30 secs                           | about 1 hour        |\n * | 89 mins 30 secs ... 23 hrs 59 mins 30 secs                        | about [2..24] hours |\n * | 23 hrs 59 mins 30 secs ... 41 hrs 59 mins 30 secs                 | 1 day               |\n * | 41 hrs 59 mins 30 secs ... 29 days 23 hrs 59 mins 30 secs         | [2..30] days        |\n * | 29 days 23 hrs 59 mins 30 secs ... 44 days 23 hrs 59 mins 30 secs | about 1 month       |\n * | 44 days 23 hrs 59 mins 30 secs ... 59 days 23 hrs 59 mins 30 secs | about 2 months      |\n * | 59 days 23 hrs 59 mins 30 secs ... 1 yr                           | [2..12] months      |\n * | 1 yr ... 1 yr 3 months                                            | about 1 year        |\n * | 1 yr 3 months ... 1 yr 9 month s                                  | over 1 year         |\n * | 1 yr 9 months ... 2 yrs                                           | almost 2 years      |\n * | N yrs ... N yrs 3 months                                          | about N years       |\n * | N yrs 3 months ... N yrs 9 months                                 | over N years        |\n * | N yrs 9 months ... N+1 yrs                                        | almost N+1 years    |\n *\n * With `options.includeSeconds == true`:\n * | Distance to now     | Result               |\n * |---------------------|----------------------|\n * | 0 secs ... 5 secs   | less than 5 seconds  |\n * | 5 secs ... 10 secs  | less than 10 seconds |\n * | 10 secs ... 20 secs | less than 20 seconds |\n * | 20 secs ... 40 secs | half a minute        |\n * | 40 secs ... 60 secs | less than a minute   |\n * | 60 secs ... 90 secs | 1 minute             |\n *\n * > ⚠️ Please note that this function is not present in the FP submodule as\n * > it uses `Date.now()` internally hence impure and can't be safely curried.\n *\n * @param {Date|Number} date - the given date\n * @param {Object} [options] - the object with options\n * @param {Boolean} [options.includeSeconds=false] - distances less than a minute are more detailed\n * @param {Boolean} [options.addSuffix=false] - result specifies if now is earlier or later than the passed date\n * @param {Locale} [options.locale=defaultLocale] - the locale object. See [Locale]{@link https://date-fns.org/docs/Locale}\n * @returns {String} the distance in words\n * @throws {TypeError} 1 argument required\n * @throws {RangeError} `date` must not be Invalid Date\n * @throws {RangeError} `options.locale` must contain `formatDistance` property\n *\n * @example\n * // If today is 1 January 2015, what is the distance to 2 July 2014?\n * const result = formatDistanceToNow(\n *   new Date(2014, 6, 2)\n * )\n * //=> '6 months'\n *\n * @example\n * // If now is 1 January 2015 00:00:00,\n * // what is the distance to 1 January 2015 00:00:15, including seconds?\n * const result = formatDistanceToNow(\n *   new Date(2015, 0, 1, 0, 0, 15),\n *   {includeSeconds: true}\n * )\n * //=> 'less than 20 seconds'\n *\n * @example\n * // If today is 1 January 2015,\n * // what is the distance to 1 January 2016, with a suffix?\n * const result = formatDistanceToNow(\n *   new Date(2016, 0, 1),\n *   {addSuffix: true}\n * )\n * //=> 'in about 1 year'\n *\n * @example\n * // If today is 1 January 2015,\n * // what is the distance to 1 August 2016 in Esperanto?\n * const eoLocale = require('date-fns/locale/eo')\n * const result = formatDistanceToNow(\n *   new Date(2016, 7, 1),\n *   {locale: eoLocale}\n * )\n * //=> 'pli ol 1 jaro'\n */\nfunction formatDistanceToNow(dirtyDate, options) {\n  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(1, arguments);\n  return (0,_formatDistance_index_js__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(dirtyDate, Date.now(), options);\n}\n\n//# sourceURL=webpack://instapro/./node_modules/date-fns/esm/formatDistanceToNow/index.js?");
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/formatDistance/index.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/date-fns/esm/formatDistance/index.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ formatDistance)\n/* harmony export */ });\n/* harmony import */ var _lib_defaultOptions_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../_lib/defaultOptions/index.js */ \"./node_modules/date-fns/esm/_lib/defaultOptions/index.js\");\n/* harmony import */ var _compareAsc_index_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../compareAsc/index.js */ \"./node_modules/date-fns/esm/compareAsc/index.js\");\n/* harmony import */ var _differenceInMonths_index_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../differenceInMonths/index.js */ \"./node_modules/date-fns/esm/differenceInMonths/index.js\");\n/* harmony import */ var _differenceInSeconds_index_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../differenceInSeconds/index.js */ \"./node_modules/date-fns/esm/differenceInSeconds/index.js\");\n/* harmony import */ var _lib_defaultLocale_index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../_lib/defaultLocale/index.js */ \"./node_modules/date-fns/esm/_lib/defaultLocale/index.js\");\n/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../toDate/index.js */ \"./node_modules/date-fns/esm/toDate/index.js\");\n/* harmony import */ var _lib_cloneObject_index_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../_lib/cloneObject/index.js */ \"./node_modules/date-fns/esm/_lib/cloneObject/index.js\");\n/* harmony import */ var _lib_assign_index_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../_lib/assign/index.js */ \"./node_modules/date-fns/esm/_lib/assign/index.js\");\n/* harmony import */ var _lib_getTimezoneOffsetInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../_lib/getTimezoneOffsetInMilliseconds/index.js */ \"./node_modules/date-fns/esm/_lib/getTimezoneOffsetInMilliseconds/index.js\");\n/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ \"./node_modules/date-fns/esm/_lib/requiredArgs/index.js\");\n\n\n\n\n\n\n\n\n\n\nvar MINUTES_IN_DAY = 1440;\nvar MINUTES_IN_ALMOST_TWO_DAYS = 2520;\nvar MINUTES_IN_MONTH = 43200;\nvar MINUTES_IN_TWO_MONTHS = 86400;\n\n/**\n * @name formatDistance\n * @category Common Helpers\n * @summary Return the distance between the given dates in words.\n *\n * @description\n * Return the distance between the given dates in words.\n *\n * | Distance between dates                                            | Result              |\n * |-------------------------------------------------------------------|---------------------|\n * | 0 ... 30 secs                                                     | less than a minute  |\n * | 30 secs ... 1 min 30 secs                                         | 1 minute            |\n * | 1 min 30 secs ... 44 mins 30 secs                                 | [2..44] minutes     |\n * | 44 mins ... 30 secs ... 89 mins 30 secs                           | about 1 hour        |\n * | 89 mins 30 secs ... 23 hrs 59 mins 30 secs                        | about [2..24] hours |\n * | 23 hrs 59 mins 30 secs ... 41 hrs 59 mins 30 secs                 | 1 day               |\n * | 41 hrs 59 mins 30 secs ... 29 days 23 hrs 59 mins 30 secs         | [2..30] days        |\n * | 29 days 23 hrs 59 mins 30 secs ... 44 days 23 hrs 59 mins 30 secs | about 1 month       |\n * | 44 days 23 hrs 59 mins 30 secs ... 59 days 23 hrs 59 mins 30 secs | about 2 months      |\n * | 59 days 23 hrs 59 mins 30 secs ... 1 yr                           | [2..12] months      |\n * | 1 yr ... 1 yr 3 months                                            | about 1 year        |\n * | 1 yr 3 months ... 1 yr 9 month s                                  | over 1 year         |\n * | 1 yr 9 months ... 2 yrs                                           | almost 2 years      |\n * | N yrs ... N yrs 3 months                                          | about N years       |\n * | N yrs 3 months ... N yrs 9 months                                 | over N years        |\n * | N yrs 9 months ... N+1 yrs                                        | almost N+1 years    |\n *\n * With `options.includeSeconds == true`:\n * | Distance between dates | Result               |\n * |------------------------|----------------------|\n * | 0 secs ... 5 secs      | less than 5 seconds  |\n * | 5 secs ... 10 secs     | less than 10 seconds |\n * | 10 secs ... 20 secs    | less than 20 seconds |\n * | 20 secs ... 40 secs    | half a minute        |\n * | 40 secs ... 60 secs    | less than a minute   |\n * | 60 secs ... 90 secs    | 1 minute             |\n *\n * @param {Date|Number} date - the date\n * @param {Date|Number} baseDate - the date to compare with\n * @param {Object} [options] - an object with options.\n * @param {Boolean} [options.includeSeconds=false] - distances less than a minute are more detailed\n * @param {Boolean} [options.addSuffix=false] - result indicates if the second date is earlier or later than the first\n * @param {Locale} [options.locale=defaultLocale] - the locale object. See [Locale]{@link https://date-fns.org/docs/Locale}\n * @returns {String} the distance in words\n * @throws {TypeError} 2 arguments required\n * @throws {RangeError} `date` must not be Invalid Date\n * @throws {RangeError} `baseDate` must not be Invalid Date\n * @throws {RangeError} `options.locale` must contain `formatDistance` property\n *\n * @example\n * // What is the distance between 2 July 2014 and 1 January 2015?\n * const result = formatDistance(new Date(2014, 6, 2), new Date(2015, 0, 1))\n * //=> '6 months'\n *\n * @example\n * // What is the distance between 1 January 2015 00:00:15\n * // and 1 January 2015 00:00:00, including seconds?\n * const result = formatDistance(\n *   new Date(2015, 0, 1, 0, 0, 15),\n *   new Date(2015, 0, 1, 0, 0, 0),\n *   { includeSeconds: true }\n * )\n * //=> 'less than 20 seconds'\n *\n * @example\n * // What is the distance from 1 January 2016\n * // to 1 January 2015, with a suffix?\n * const result = formatDistance(new Date(2015, 0, 1), new Date(2016, 0, 1), {\n *   addSuffix: true\n * })\n * //=> 'about 1 year ago'\n *\n * @example\n * // What is the distance between 1 August 2016 and 1 January 2015 in Esperanto?\n * import { eoLocale } from 'date-fns/locale/eo'\n * const result = formatDistance(new Date(2016, 7, 1), new Date(2015, 0, 1), {\n *   locale: eoLocale\n * })\n * //=> 'pli ol 1 jaro'\n */\n\nfunction formatDistance(dirtyDate, dirtyBaseDate, options) {\n  var _ref, _options$locale;\n  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(2, arguments);\n  var defaultOptions = (0,_lib_defaultOptions_index_js__WEBPACK_IMPORTED_MODULE_1__.getDefaultOptions)();\n  var locale = (_ref = (_options$locale = options === null || options === void 0 ? void 0 : options.locale) !== null && _options$locale !== void 0 ? _options$locale : defaultOptions.locale) !== null && _ref !== void 0 ? _ref : _lib_defaultLocale_index_js__WEBPACK_IMPORTED_MODULE_2__[\"default\"];\n  if (!locale.formatDistance) {\n    throw new RangeError('locale must contain formatDistance property');\n  }\n  var comparison = (0,_compareAsc_index_js__WEBPACK_IMPORTED_MODULE_3__[\"default\"])(dirtyDate, dirtyBaseDate);\n  if (isNaN(comparison)) {\n    throw new RangeError('Invalid time value');\n  }\n  var localizeOptions = (0,_lib_assign_index_js__WEBPACK_IMPORTED_MODULE_4__[\"default\"])((0,_lib_cloneObject_index_js__WEBPACK_IMPORTED_MODULE_5__[\"default\"])(options), {\n    addSuffix: Boolean(options === null || options === void 0 ? void 0 : options.addSuffix),\n    comparison: comparison\n  });\n  var dateLeft;\n  var dateRight;\n  if (comparison > 0) {\n    dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(dirtyBaseDate);\n    dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(dirtyDate);\n  } else {\n    dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(dirtyDate);\n    dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(dirtyBaseDate);\n  }\n  var seconds = (0,_differenceInSeconds_index_js__WEBPACK_IMPORTED_MODULE_7__[\"default\"])(dateRight, dateLeft);\n  var offsetInSeconds = ((0,_lib_getTimezoneOffsetInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_8__[\"default\"])(dateRight) - (0,_lib_getTimezoneOffsetInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_8__[\"default\"])(dateLeft)) / 1000;\n  var minutes = Math.round((seconds - offsetInSeconds) / 60);\n  var months;\n\n  // 0 up to 2 mins\n  if (minutes < 2) {\n    if (options !== null && options !== void 0 && options.includeSeconds) {\n      if (seconds < 5) {\n        return locale.formatDistance('lessThanXSeconds', 5, localizeOptions);\n      } else if (seconds < 10) {\n        return locale.formatDistance('lessThanXSeconds', 10, localizeOptions);\n      } else if (seconds < 20) {\n        return locale.formatDistance('lessThanXSeconds', 20, localizeOptions);\n      } else if (seconds < 40) {\n        return locale.formatDistance('halfAMinute', 0, localizeOptions);\n      } else if (seconds < 60) {\n        return locale.formatDistance('lessThanXMinutes', 1, localizeOptions);\n      } else {\n        return locale.formatDistance('xMinutes', 1, localizeOptions);\n      }\n    } else {\n      if (minutes === 0) {\n        return locale.formatDistance('lessThanXMinutes', 1, localizeOptions);\n      } else {\n        return locale.formatDistance('xMinutes', minutes, localizeOptions);\n      }\n    }\n\n    // 2 mins up to 0.75 hrs\n  } else if (minutes < 45) {\n    return locale.formatDistance('xMinutes', minutes, localizeOptions);\n\n    // 0.75 hrs up to 1.5 hrs\n  } else if (minutes < 90) {\n    return locale.formatDistance('aboutXHours', 1, localizeOptions);\n\n    // 1.5 hrs up to 24 hrs\n  } else if (minutes < MINUTES_IN_DAY) {\n    var hours = Math.round(minutes / 60);\n    return locale.formatDistance('aboutXHours', hours, localizeOptions);\n\n    // 1 day up to 1.75 days\n  } else if (minutes < MINUTES_IN_ALMOST_TWO_DAYS) {\n    return locale.formatDistance('xDays', 1, localizeOptions);\n\n    // 1.75 days up to 30 days\n  } else if (minutes < MINUTES_IN_MONTH) {\n    var days = Math.round(minutes / MINUTES_IN_DAY);\n    return locale.formatDistance('xDays', days, localizeOptions);\n\n    // 1 month up to 2 months\n  } else if (minutes < MINUTES_IN_TWO_MONTHS) {\n    months = Math.round(minutes / MINUTES_IN_MONTH);\n    return locale.formatDistance('aboutXMonths', months, localizeOptions);\n  }\n  months = (0,_differenceInMonths_index_js__WEBPACK_IMPORTED_MODULE_9__[\"default\"])(dateRight, dateLeft);\n\n  // 2 months up to 12 months\n  if (months < 12) {\n    var nearestMonth = Math.round(minutes / MINUTES_IN_MONTH);\n    return locale.formatDistance('xMonths', nearestMonth, localizeOptions);\n\n    // 1 year up to max Date\n  } else {\n    var monthsSinceStartOfYear = months % 12;\n    var years = Math.floor(months / 12);\n\n    // N years up to 1 years 3 months\n    if (monthsSinceStartOfYear < 3) {\n      return locale.formatDistance('aboutXYears', years, localizeOptions);\n\n      // N years 3 months up to N years 9 months\n    } else if (monthsSinceStartOfYear < 9) {\n      return locale.formatDistance('overXYears', years, localizeOptions);\n\n      // N years 9 months up to N year 12 months\n    } else {\n      return locale.formatDistance('almostXYears', years + 1, localizeOptions);\n    }\n  }\n}\n\n//# sourceURL=webpack://instapro/./node_modules/date-fns/esm/formatDistance/index.js?");
 
 /***/ }),
 
@@ -480,16 +480,6 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
-/***/ "./routes.js":
-/*!*******************!*\
-  !*** ./routes.js ***!
-  \*******************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   ADD_POSTS_PAGE: () => (/* binding */ ADD_POSTS_PAGE),\n/* harmony export */   AUTH_PAGE: () => (/* binding */ AUTH_PAGE),\n/* harmony export */   LOADING_PAGE: () => (/* binding */ LOADING_PAGE),\n/* harmony export */   POSTS_PAGE: () => (/* binding */ POSTS_PAGE),\n/* harmony export */   USER_POSTS_PAGE: () => (/* binding */ USER_POSTS_PAGE)\n/* harmony export */ });\n// Файл со списком страниц приложения\nconst POSTS_PAGE = \"posts\";\nconst USER_POSTS_PAGE = \"user-posts\";\nconst AUTH_PAGE = \"auth\";\nconst ADD_POSTS_PAGE = \"add-post\";\nconst LOADING_PAGE = \"loading\";\n\n\n//# sourceURL=webpack://instapro/./routes.js?");
-
-/***/ }),
-
 /***/ "./node_modules/@babel/runtime/helpers/esm/typeof.js":
 /*!***********************************************************!*\
   !*** ./node_modules/@babel/runtime/helpers/esm/typeof.js ***!
@@ -510,6 +500,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 		// Check if module is in cache
 /******/ 		var cachedModule = __webpack_module_cache__[moduleId];
 /******/ 		if (cachedModule !== undefined) {
+/******/ 			if (cachedModule.error !== undefined) throw cachedModule.error;
 /******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
@@ -520,11 +511,28 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 		try {
+/******/ 			var execOptions = { id: moduleId, module: module, factory: __webpack_modules__[moduleId], require: __webpack_require__ };
+/******/ 			__webpack_require__.i.forEach(function(handler) { handler(execOptions); });
+/******/ 			module = execOptions.module;
+/******/ 			execOptions.factory.call(module.exports, module, module.exports, execOptions.require);
+/******/ 		} catch(e) {
+/******/ 			module.error = e;
+/******/ 			throw e;
+/******/ 		}
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
+/******/ 	
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = __webpack_modules__;
+/******/ 	
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = __webpack_module_cache__;
+/******/ 	
+/******/ 	// expose the module execution interceptor
+/******/ 	__webpack_require__.i = [];
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
@@ -539,9 +547,86 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/get javascript update chunk filename */
+/******/ 	(() => {
+/******/ 		// This function allow to reference all chunks
+/******/ 		__webpack_require__.hu = (chunkId) => {
+/******/ 			// return url for filenames based on template
+/******/ 			return "" + chunkId + "." + __webpack_require__.h() + ".hot-update.js";
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/get update manifest filename */
+/******/ 	(() => {
+/******/ 		__webpack_require__.hmrF = () => ("main." + __webpack_require__.h() + ".hot-update.json");
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/getFullHash */
+/******/ 	(() => {
+/******/ 		__webpack_require__.h = () => ("d857be549fc0a9eb9379")
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/global */
+/******/ 	(() => {
+/******/ 		__webpack_require__.g = (function() {
+/******/ 			if (typeof globalThis === 'object') return globalThis;
+/******/ 			try {
+/******/ 				return this || new Function('return this')();
+/******/ 			} catch (e) {
+/******/ 				if (typeof window === 'object') return window;
+/******/ 			}
+/******/ 		})();
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/load script */
+/******/ 	(() => {
+/******/ 		var inProgress = {};
+/******/ 		var dataWebpackPrefix = "instapro:";
+/******/ 		// loadScript function to load a script via script tag
+/******/ 		__webpack_require__.l = (url, done, key, chunkId) => {
+/******/ 			if(inProgress[url]) { inProgress[url].push(done); return; }
+/******/ 			var script, needAttach;
+/******/ 			if(key !== undefined) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				for(var i = 0; i < scripts.length; i++) {
+/******/ 					var s = scripts[i];
+/******/ 					if(s.getAttribute("src") == url || s.getAttribute("data-webpack") == dataWebpackPrefix + key) { script = s; break; }
+/******/ 				}
+/******/ 			}
+/******/ 			if(!script) {
+/******/ 				needAttach = true;
+/******/ 				script = document.createElement('script');
+/******/ 		
+/******/ 				script.charset = 'utf-8';
+/******/ 				script.timeout = 120;
+/******/ 				if (__webpack_require__.nc) {
+/******/ 					script.setAttribute("nonce", __webpack_require__.nc);
+/******/ 				}
+/******/ 				script.setAttribute("data-webpack", dataWebpackPrefix + key);
+/******/ 		
+/******/ 				script.src = url;
+/******/ 			}
+/******/ 			inProgress[url] = [done];
+/******/ 			var onScriptComplete = (prev, event) => {
+/******/ 				// avoid mem leaks in IE.
+/******/ 				script.onerror = script.onload = null;
+/******/ 				clearTimeout(timeout);
+/******/ 				var doneFns = inProgress[url];
+/******/ 				delete inProgress[url];
+/******/ 				script.parentNode && script.parentNode.removeChild(script);
+/******/ 				doneFns && doneFns.forEach((fn) => (fn(event)));
+/******/ 				if(prev) return prev(event);
+/******/ 			}
+/******/ 			var timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
+/******/ 			script.onerror = onScriptComplete.bind(null, script.onerror);
+/******/ 			script.onload = onScriptComplete.bind(null, script.onload);
+/******/ 			needAttach && document.head.appendChild(script);
+/******/ 		};
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
@@ -555,12 +640,944 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/hot module replacement */
+/******/ 	(() => {
+/******/ 		var currentModuleData = {};
+/******/ 		var installedModules = __webpack_require__.c;
+/******/ 		
+/******/ 		// module and require creation
+/******/ 		var currentChildModule;
+/******/ 		var currentParents = [];
+/******/ 		
+/******/ 		// status
+/******/ 		var registeredStatusHandlers = [];
+/******/ 		var currentStatus = "idle";
+/******/ 		
+/******/ 		// while downloading
+/******/ 		var blockingPromises = 0;
+/******/ 		var blockingPromisesWaiting = [];
+/******/ 		
+/******/ 		// The update info
+/******/ 		var currentUpdateApplyHandlers;
+/******/ 		var queuedInvalidatedModules;
+/******/ 		
+/******/ 		// eslint-disable-next-line no-unused-vars
+/******/ 		__webpack_require__.hmrD = currentModuleData;
+/******/ 		
+/******/ 		__webpack_require__.i.push(function (options) {
+/******/ 			var module = options.module;
+/******/ 			var require = createRequire(options.require, options.id);
+/******/ 			module.hot = createModuleHotObject(options.id, module);
+/******/ 			module.parents = currentParents;
+/******/ 			module.children = [];
+/******/ 			currentParents = [];
+/******/ 			options.require = require;
+/******/ 		});
+/******/ 		
+/******/ 		__webpack_require__.hmrC = {};
+/******/ 		__webpack_require__.hmrI = {};
+/******/ 		
+/******/ 		function createRequire(require, moduleId) {
+/******/ 			var me = installedModules[moduleId];
+/******/ 			if (!me) return require;
+/******/ 			var fn = function (request) {
+/******/ 				if (me.hot.active) {
+/******/ 					if (installedModules[request]) {
+/******/ 						var parents = installedModules[request].parents;
+/******/ 						if (parents.indexOf(moduleId) === -1) {
+/******/ 							parents.push(moduleId);
+/******/ 						}
+/******/ 					} else {
+/******/ 						currentParents = [moduleId];
+/******/ 						currentChildModule = request;
+/******/ 					}
+/******/ 					if (me.children.indexOf(request) === -1) {
+/******/ 						me.children.push(request);
+/******/ 					}
+/******/ 				} else {
+/******/ 					console.warn(
+/******/ 						"[HMR] unexpected require(" +
+/******/ 							request +
+/******/ 							") from disposed module " +
+/******/ 							moduleId
+/******/ 					);
+/******/ 					currentParents = [];
+/******/ 				}
+/******/ 				return require(request);
+/******/ 			};
+/******/ 			var createPropertyDescriptor = function (name) {
+/******/ 				return {
+/******/ 					configurable: true,
+/******/ 					enumerable: true,
+/******/ 					get: function () {
+/******/ 						return require[name];
+/******/ 					},
+/******/ 					set: function (value) {
+/******/ 						require[name] = value;
+/******/ 					}
+/******/ 				};
+/******/ 			};
+/******/ 			for (var name in require) {
+/******/ 				if (Object.prototype.hasOwnProperty.call(require, name) && name !== "e") {
+/******/ 					Object.defineProperty(fn, name, createPropertyDescriptor(name));
+/******/ 				}
+/******/ 			}
+/******/ 			fn.e = function (chunkId) {
+/******/ 				return trackBlockingPromise(require.e(chunkId));
+/******/ 			};
+/******/ 			return fn;
+/******/ 		}
+/******/ 		
+/******/ 		function createModuleHotObject(moduleId, me) {
+/******/ 			var _main = currentChildModule !== moduleId;
+/******/ 			var hot = {
+/******/ 				// private stuff
+/******/ 				_acceptedDependencies: {},
+/******/ 				_acceptedErrorHandlers: {},
+/******/ 				_declinedDependencies: {},
+/******/ 				_selfAccepted: false,
+/******/ 				_selfDeclined: false,
+/******/ 				_selfInvalidated: false,
+/******/ 				_disposeHandlers: [],
+/******/ 				_main: _main,
+/******/ 				_requireSelf: function () {
+/******/ 					currentParents = me.parents.slice();
+/******/ 					currentChildModule = _main ? undefined : moduleId;
+/******/ 					__webpack_require__(moduleId);
+/******/ 				},
+/******/ 		
+/******/ 				// Module API
+/******/ 				active: true,
+/******/ 				accept: function (dep, callback, errorHandler) {
+/******/ 					if (dep === undefined) hot._selfAccepted = true;
+/******/ 					else if (typeof dep === "function") hot._selfAccepted = dep;
+/******/ 					else if (typeof dep === "object" && dep !== null) {
+/******/ 						for (var i = 0; i < dep.length; i++) {
+/******/ 							hot._acceptedDependencies[dep[i]] = callback || function () {};
+/******/ 							hot._acceptedErrorHandlers[dep[i]] = errorHandler;
+/******/ 						}
+/******/ 					} else {
+/******/ 						hot._acceptedDependencies[dep] = callback || function () {};
+/******/ 						hot._acceptedErrorHandlers[dep] = errorHandler;
+/******/ 					}
+/******/ 				},
+/******/ 				decline: function (dep) {
+/******/ 					if (dep === undefined) hot._selfDeclined = true;
+/******/ 					else if (typeof dep === "object" && dep !== null)
+/******/ 						for (var i = 0; i < dep.length; i++)
+/******/ 							hot._declinedDependencies[dep[i]] = true;
+/******/ 					else hot._declinedDependencies[dep] = true;
+/******/ 				},
+/******/ 				dispose: function (callback) {
+/******/ 					hot._disposeHandlers.push(callback);
+/******/ 				},
+/******/ 				addDisposeHandler: function (callback) {
+/******/ 					hot._disposeHandlers.push(callback);
+/******/ 				},
+/******/ 				removeDisposeHandler: function (callback) {
+/******/ 					var idx = hot._disposeHandlers.indexOf(callback);
+/******/ 					if (idx >= 0) hot._disposeHandlers.splice(idx, 1);
+/******/ 				},
+/******/ 				invalidate: function () {
+/******/ 					this._selfInvalidated = true;
+/******/ 					switch (currentStatus) {
+/******/ 						case "idle":
+/******/ 							currentUpdateApplyHandlers = [];
+/******/ 							Object.keys(__webpack_require__.hmrI).forEach(function (key) {
+/******/ 								__webpack_require__.hmrI[key](
+/******/ 									moduleId,
+/******/ 									currentUpdateApplyHandlers
+/******/ 								);
+/******/ 							});
+/******/ 							setStatus("ready");
+/******/ 							break;
+/******/ 						case "ready":
+/******/ 							Object.keys(__webpack_require__.hmrI).forEach(function (key) {
+/******/ 								__webpack_require__.hmrI[key](
+/******/ 									moduleId,
+/******/ 									currentUpdateApplyHandlers
+/******/ 								);
+/******/ 							});
+/******/ 							break;
+/******/ 						case "prepare":
+/******/ 						case "check":
+/******/ 						case "dispose":
+/******/ 						case "apply":
+/******/ 							(queuedInvalidatedModules = queuedInvalidatedModules || []).push(
+/******/ 								moduleId
+/******/ 							);
+/******/ 							break;
+/******/ 						default:
+/******/ 							// ignore requests in error states
+/******/ 							break;
+/******/ 					}
+/******/ 				},
+/******/ 		
+/******/ 				// Management API
+/******/ 				check: hotCheck,
+/******/ 				apply: hotApply,
+/******/ 				status: function (l) {
+/******/ 					if (!l) return currentStatus;
+/******/ 					registeredStatusHandlers.push(l);
+/******/ 				},
+/******/ 				addStatusHandler: function (l) {
+/******/ 					registeredStatusHandlers.push(l);
+/******/ 				},
+/******/ 				removeStatusHandler: function (l) {
+/******/ 					var idx = registeredStatusHandlers.indexOf(l);
+/******/ 					if (idx >= 0) registeredStatusHandlers.splice(idx, 1);
+/******/ 				},
+/******/ 		
+/******/ 				//inherit from previous dispose call
+/******/ 				data: currentModuleData[moduleId]
+/******/ 			};
+/******/ 			currentChildModule = undefined;
+/******/ 			return hot;
+/******/ 		}
+/******/ 		
+/******/ 		function setStatus(newStatus) {
+/******/ 			currentStatus = newStatus;
+/******/ 			var results = [];
+/******/ 		
+/******/ 			for (var i = 0; i < registeredStatusHandlers.length; i++)
+/******/ 				results[i] = registeredStatusHandlers[i].call(null, newStatus);
+/******/ 		
+/******/ 			return Promise.all(results);
+/******/ 		}
+/******/ 		
+/******/ 		function unblock() {
+/******/ 			if (--blockingPromises === 0) {
+/******/ 				setStatus("ready").then(function () {
+/******/ 					if (blockingPromises === 0) {
+/******/ 						var list = blockingPromisesWaiting;
+/******/ 						blockingPromisesWaiting = [];
+/******/ 						for (var i = 0; i < list.length; i++) {
+/******/ 							list[i]();
+/******/ 						}
+/******/ 					}
+/******/ 				});
+/******/ 			}
+/******/ 		}
+/******/ 		
+/******/ 		function trackBlockingPromise(promise) {
+/******/ 			switch (currentStatus) {
+/******/ 				case "ready":
+/******/ 					setStatus("prepare");
+/******/ 				/* fallthrough */
+/******/ 				case "prepare":
+/******/ 					blockingPromises++;
+/******/ 					promise.then(unblock, unblock);
+/******/ 					return promise;
+/******/ 				default:
+/******/ 					return promise;
+/******/ 			}
+/******/ 		}
+/******/ 		
+/******/ 		function waitForBlockingPromises(fn) {
+/******/ 			if (blockingPromises === 0) return fn();
+/******/ 			return new Promise(function (resolve) {
+/******/ 				blockingPromisesWaiting.push(function () {
+/******/ 					resolve(fn());
+/******/ 				});
+/******/ 			});
+/******/ 		}
+/******/ 		
+/******/ 		function hotCheck(applyOnUpdate) {
+/******/ 			if (currentStatus !== "idle") {
+/******/ 				throw new Error("check() is only allowed in idle status");
+/******/ 			}
+/******/ 			return setStatus("check")
+/******/ 				.then(__webpack_require__.hmrM)
+/******/ 				.then(function (update) {
+/******/ 					if (!update) {
+/******/ 						return setStatus(applyInvalidatedModules() ? "ready" : "idle").then(
+/******/ 							function () {
+/******/ 								return null;
+/******/ 							}
+/******/ 						);
+/******/ 					}
+/******/ 		
+/******/ 					return setStatus("prepare").then(function () {
+/******/ 						var updatedModules = [];
+/******/ 						currentUpdateApplyHandlers = [];
+/******/ 		
+/******/ 						return Promise.all(
+/******/ 							Object.keys(__webpack_require__.hmrC).reduce(function (
+/******/ 								promises,
+/******/ 								key
+/******/ 							) {
+/******/ 								__webpack_require__.hmrC[key](
+/******/ 									update.c,
+/******/ 									update.r,
+/******/ 									update.m,
+/******/ 									promises,
+/******/ 									currentUpdateApplyHandlers,
+/******/ 									updatedModules
+/******/ 								);
+/******/ 								return promises;
+/******/ 							},
+/******/ 							[])
+/******/ 						).then(function () {
+/******/ 							return waitForBlockingPromises(function () {
+/******/ 								if (applyOnUpdate) {
+/******/ 									return internalApply(applyOnUpdate);
+/******/ 								} else {
+/******/ 									return setStatus("ready").then(function () {
+/******/ 										return updatedModules;
+/******/ 									});
+/******/ 								}
+/******/ 							});
+/******/ 						});
+/******/ 					});
+/******/ 				});
+/******/ 		}
+/******/ 		
+/******/ 		function hotApply(options) {
+/******/ 			if (currentStatus !== "ready") {
+/******/ 				return Promise.resolve().then(function () {
+/******/ 					throw new Error(
+/******/ 						"apply() is only allowed in ready status (state: " +
+/******/ 							currentStatus +
+/******/ 							")"
+/******/ 					);
+/******/ 				});
+/******/ 			}
+/******/ 			return internalApply(options);
+/******/ 		}
+/******/ 		
+/******/ 		function internalApply(options) {
+/******/ 			options = options || {};
+/******/ 		
+/******/ 			applyInvalidatedModules();
+/******/ 		
+/******/ 			var results = currentUpdateApplyHandlers.map(function (handler) {
+/******/ 				return handler(options);
+/******/ 			});
+/******/ 			currentUpdateApplyHandlers = undefined;
+/******/ 		
+/******/ 			var errors = results
+/******/ 				.map(function (r) {
+/******/ 					return r.error;
+/******/ 				})
+/******/ 				.filter(Boolean);
+/******/ 		
+/******/ 			if (errors.length > 0) {
+/******/ 				return setStatus("abort").then(function () {
+/******/ 					throw errors[0];
+/******/ 				});
+/******/ 			}
+/******/ 		
+/******/ 			// Now in "dispose" phase
+/******/ 			var disposePromise = setStatus("dispose");
+/******/ 		
+/******/ 			results.forEach(function (result) {
+/******/ 				if (result.dispose) result.dispose();
+/******/ 			});
+/******/ 		
+/******/ 			// Now in "apply" phase
+/******/ 			var applyPromise = setStatus("apply");
+/******/ 		
+/******/ 			var error;
+/******/ 			var reportError = function (err) {
+/******/ 				if (!error) error = err;
+/******/ 			};
+/******/ 		
+/******/ 			var outdatedModules = [];
+/******/ 			results.forEach(function (result) {
+/******/ 				if (result.apply) {
+/******/ 					var modules = result.apply(reportError);
+/******/ 					if (modules) {
+/******/ 						for (var i = 0; i < modules.length; i++) {
+/******/ 							outdatedModules.push(modules[i]);
+/******/ 						}
+/******/ 					}
+/******/ 				}
+/******/ 			});
+/******/ 		
+/******/ 			return Promise.all([disposePromise, applyPromise]).then(function () {
+/******/ 				// handle errors in accept handlers and self accepted module load
+/******/ 				if (error) {
+/******/ 					return setStatus("fail").then(function () {
+/******/ 						throw error;
+/******/ 					});
+/******/ 				}
+/******/ 		
+/******/ 				if (queuedInvalidatedModules) {
+/******/ 					return internalApply(options).then(function (list) {
+/******/ 						outdatedModules.forEach(function (moduleId) {
+/******/ 							if (list.indexOf(moduleId) < 0) list.push(moduleId);
+/******/ 						});
+/******/ 						return list;
+/******/ 					});
+/******/ 				}
+/******/ 		
+/******/ 				return setStatus("idle").then(function () {
+/******/ 					return outdatedModules;
+/******/ 				});
+/******/ 			});
+/******/ 		}
+/******/ 		
+/******/ 		function applyInvalidatedModules() {
+/******/ 			if (queuedInvalidatedModules) {
+/******/ 				if (!currentUpdateApplyHandlers) currentUpdateApplyHandlers = [];
+/******/ 				Object.keys(__webpack_require__.hmrI).forEach(function (key) {
+/******/ 					queuedInvalidatedModules.forEach(function (moduleId) {
+/******/ 						__webpack_require__.hmrI[key](
+/******/ 							moduleId,
+/******/ 							currentUpdateApplyHandlers
+/******/ 						);
+/******/ 					});
+/******/ 				});
+/******/ 				queuedInvalidatedModules = undefined;
+/******/ 				return true;
+/******/ 			}
+/******/ 		}
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/publicPath */
+/******/ 	(() => {
+/******/ 		var scriptUrl;
+/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
+/******/ 		var document = __webpack_require__.g.document;
+/******/ 		if (!scriptUrl && document) {
+/******/ 			if (document.currentScript)
+/******/ 				scriptUrl = document.currentScript.src;
+/******/ 			if (!scriptUrl) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				if(scripts.length) {
+/******/ 					var i = scripts.length - 1;
+/******/ 					while (i > -1 && !scriptUrl) scriptUrl = scripts[i--].src;
+/******/ 				}
+/******/ 			}
+/******/ 		}
+/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
+/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
+/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
+/******/ 		scriptUrl = scriptUrl.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
+/******/ 		__webpack_require__.p = scriptUrl;
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/jsonp chunk loading */
+/******/ 	(() => {
+/******/ 		// no baseURI
+/******/ 		
+/******/ 		// object to store loaded and loading chunks
+/******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
+/******/ 		var installedChunks = __webpack_require__.hmrS_jsonp = __webpack_require__.hmrS_jsonp || {
+/******/ 			"main": 0
+/******/ 		};
+/******/ 		
+/******/ 		// no chunk on demand loading
+/******/ 		
+/******/ 		// no prefetching
+/******/ 		
+/******/ 		// no preloaded
+/******/ 		
+/******/ 		var currentUpdatedModulesList;
+/******/ 		var waitingUpdateResolves = {};
+/******/ 		function loadUpdateChunk(chunkId, updatedModulesList) {
+/******/ 			currentUpdatedModulesList = updatedModulesList;
+/******/ 			return new Promise((resolve, reject) => {
+/******/ 				waitingUpdateResolves[chunkId] = resolve;
+/******/ 				// start update chunk loading
+/******/ 				var url = __webpack_require__.p + __webpack_require__.hu(chunkId);
+/******/ 				// create error before stack unwound to get useful stacktrace later
+/******/ 				var error = new Error();
+/******/ 				var loadingEnded = (event) => {
+/******/ 					if(waitingUpdateResolves[chunkId]) {
+/******/ 						waitingUpdateResolves[chunkId] = undefined
+/******/ 						var errorType = event && (event.type === 'load' ? 'missing' : event.type);
+/******/ 						var realSrc = event && event.target && event.target.src;
+/******/ 						error.message = 'Loading hot update chunk ' + chunkId + ' failed.\n(' + errorType + ': ' + realSrc + ')';
+/******/ 						error.name = 'ChunkLoadError';
+/******/ 						error.type = errorType;
+/******/ 						error.request = realSrc;
+/******/ 						reject(error);
+/******/ 					}
+/******/ 				};
+/******/ 				__webpack_require__.l(url, loadingEnded);
+/******/ 			});
+/******/ 		}
+/******/ 		
+/******/ 		self["webpackHotUpdateinstapro"] = (chunkId, moreModules, runtime) => {
+/******/ 			for(var moduleId in moreModules) {
+/******/ 				if(__webpack_require__.o(moreModules, moduleId)) {
+/******/ 					currentUpdate[moduleId] = moreModules[moduleId];
+/******/ 					if(currentUpdatedModulesList) currentUpdatedModulesList.push(moduleId);
+/******/ 				}
+/******/ 			}
+/******/ 			if(runtime) currentUpdateRuntime.push(runtime);
+/******/ 			if(waitingUpdateResolves[chunkId]) {
+/******/ 				waitingUpdateResolves[chunkId]();
+/******/ 				waitingUpdateResolves[chunkId] = undefined;
+/******/ 			}
+/******/ 		};
+/******/ 		
+/******/ 		var currentUpdateChunks;
+/******/ 		var currentUpdate;
+/******/ 		var currentUpdateRemovedChunks;
+/******/ 		var currentUpdateRuntime;
+/******/ 		function applyHandler(options) {
+/******/ 			if (__webpack_require__.f) delete __webpack_require__.f.jsonpHmr;
+/******/ 			currentUpdateChunks = undefined;
+/******/ 			function getAffectedModuleEffects(updateModuleId) {
+/******/ 				var outdatedModules = [updateModuleId];
+/******/ 				var outdatedDependencies = {};
+/******/ 		
+/******/ 				var queue = outdatedModules.map(function (id) {
+/******/ 					return {
+/******/ 						chain: [id],
+/******/ 						id: id
+/******/ 					};
+/******/ 				});
+/******/ 				while (queue.length > 0) {
+/******/ 					var queueItem = queue.pop();
+/******/ 					var moduleId = queueItem.id;
+/******/ 					var chain = queueItem.chain;
+/******/ 					var module = __webpack_require__.c[moduleId];
+/******/ 					if (
+/******/ 						!module ||
+/******/ 						(module.hot._selfAccepted && !module.hot._selfInvalidated)
+/******/ 					)
+/******/ 						continue;
+/******/ 					if (module.hot._selfDeclined) {
+/******/ 						return {
+/******/ 							type: "self-declined",
+/******/ 							chain: chain,
+/******/ 							moduleId: moduleId
+/******/ 						};
+/******/ 					}
+/******/ 					if (module.hot._main) {
+/******/ 						return {
+/******/ 							type: "unaccepted",
+/******/ 							chain: chain,
+/******/ 							moduleId: moduleId
+/******/ 						};
+/******/ 					}
+/******/ 					for (var i = 0; i < module.parents.length; i++) {
+/******/ 						var parentId = module.parents[i];
+/******/ 						var parent = __webpack_require__.c[parentId];
+/******/ 						if (!parent) continue;
+/******/ 						if (parent.hot._declinedDependencies[moduleId]) {
+/******/ 							return {
+/******/ 								type: "declined",
+/******/ 								chain: chain.concat([parentId]),
+/******/ 								moduleId: moduleId,
+/******/ 								parentId: parentId
+/******/ 							};
+/******/ 						}
+/******/ 						if (outdatedModules.indexOf(parentId) !== -1) continue;
+/******/ 						if (parent.hot._acceptedDependencies[moduleId]) {
+/******/ 							if (!outdatedDependencies[parentId])
+/******/ 								outdatedDependencies[parentId] = [];
+/******/ 							addAllToSet(outdatedDependencies[parentId], [moduleId]);
+/******/ 							continue;
+/******/ 						}
+/******/ 						delete outdatedDependencies[parentId];
+/******/ 						outdatedModules.push(parentId);
+/******/ 						queue.push({
+/******/ 							chain: chain.concat([parentId]),
+/******/ 							id: parentId
+/******/ 						});
+/******/ 					}
+/******/ 				}
+/******/ 		
+/******/ 				return {
+/******/ 					type: "accepted",
+/******/ 					moduleId: updateModuleId,
+/******/ 					outdatedModules: outdatedModules,
+/******/ 					outdatedDependencies: outdatedDependencies
+/******/ 				};
+/******/ 			}
+/******/ 		
+/******/ 			function addAllToSet(a, b) {
+/******/ 				for (var i = 0; i < b.length; i++) {
+/******/ 					var item = b[i];
+/******/ 					if (a.indexOf(item) === -1) a.push(item);
+/******/ 				}
+/******/ 			}
+/******/ 		
+/******/ 			// at begin all updates modules are outdated
+/******/ 			// the "outdated" status can propagate to parents if they don't accept the children
+/******/ 			var outdatedDependencies = {};
+/******/ 			var outdatedModules = [];
+/******/ 			var appliedUpdate = {};
+/******/ 		
+/******/ 			var warnUnexpectedRequire = function warnUnexpectedRequire(module) {
+/******/ 				console.warn(
+/******/ 					"[HMR] unexpected require(" + module.id + ") to disposed module"
+/******/ 				);
+/******/ 			};
+/******/ 		
+/******/ 			for (var moduleId in currentUpdate) {
+/******/ 				if (__webpack_require__.o(currentUpdate, moduleId)) {
+/******/ 					var newModuleFactory = currentUpdate[moduleId];
+/******/ 					/** @type {TODO} */
+/******/ 					var result;
+/******/ 					if (newModuleFactory) {
+/******/ 						result = getAffectedModuleEffects(moduleId);
+/******/ 					} else {
+/******/ 						result = {
+/******/ 							type: "disposed",
+/******/ 							moduleId: moduleId
+/******/ 						};
+/******/ 					}
+/******/ 					/** @type {Error|false} */
+/******/ 					var abortError = false;
+/******/ 					var doApply = false;
+/******/ 					var doDispose = false;
+/******/ 					var chainInfo = "";
+/******/ 					if (result.chain) {
+/******/ 						chainInfo = "\nUpdate propagation: " + result.chain.join(" -> ");
+/******/ 					}
+/******/ 					switch (result.type) {
+/******/ 						case "self-declined":
+/******/ 							if (options.onDeclined) options.onDeclined(result);
+/******/ 							if (!options.ignoreDeclined)
+/******/ 								abortError = new Error(
+/******/ 									"Aborted because of self decline: " +
+/******/ 										result.moduleId +
+/******/ 										chainInfo
+/******/ 								);
+/******/ 							break;
+/******/ 						case "declined":
+/******/ 							if (options.onDeclined) options.onDeclined(result);
+/******/ 							if (!options.ignoreDeclined)
+/******/ 								abortError = new Error(
+/******/ 									"Aborted because of declined dependency: " +
+/******/ 										result.moduleId +
+/******/ 										" in " +
+/******/ 										result.parentId +
+/******/ 										chainInfo
+/******/ 								);
+/******/ 							break;
+/******/ 						case "unaccepted":
+/******/ 							if (options.onUnaccepted) options.onUnaccepted(result);
+/******/ 							if (!options.ignoreUnaccepted)
+/******/ 								abortError = new Error(
+/******/ 									"Aborted because " + moduleId + " is not accepted" + chainInfo
+/******/ 								);
+/******/ 							break;
+/******/ 						case "accepted":
+/******/ 							if (options.onAccepted) options.onAccepted(result);
+/******/ 							doApply = true;
+/******/ 							break;
+/******/ 						case "disposed":
+/******/ 							if (options.onDisposed) options.onDisposed(result);
+/******/ 							doDispose = true;
+/******/ 							break;
+/******/ 						default:
+/******/ 							throw new Error("Unexception type " + result.type);
+/******/ 					}
+/******/ 					if (abortError) {
+/******/ 						return {
+/******/ 							error: abortError
+/******/ 						};
+/******/ 					}
+/******/ 					if (doApply) {
+/******/ 						appliedUpdate[moduleId] = newModuleFactory;
+/******/ 						addAllToSet(outdatedModules, result.outdatedModules);
+/******/ 						for (moduleId in result.outdatedDependencies) {
+/******/ 							if (__webpack_require__.o(result.outdatedDependencies, moduleId)) {
+/******/ 								if (!outdatedDependencies[moduleId])
+/******/ 									outdatedDependencies[moduleId] = [];
+/******/ 								addAllToSet(
+/******/ 									outdatedDependencies[moduleId],
+/******/ 									result.outdatedDependencies[moduleId]
+/******/ 								);
+/******/ 							}
+/******/ 						}
+/******/ 					}
+/******/ 					if (doDispose) {
+/******/ 						addAllToSet(outdatedModules, [result.moduleId]);
+/******/ 						appliedUpdate[moduleId] = warnUnexpectedRequire;
+/******/ 					}
+/******/ 				}
+/******/ 			}
+/******/ 			currentUpdate = undefined;
+/******/ 		
+/******/ 			// Store self accepted outdated modules to require them later by the module system
+/******/ 			var outdatedSelfAcceptedModules = [];
+/******/ 			for (var j = 0; j < outdatedModules.length; j++) {
+/******/ 				var outdatedModuleId = outdatedModules[j];
+/******/ 				var module = __webpack_require__.c[outdatedModuleId];
+/******/ 				if (
+/******/ 					module &&
+/******/ 					(module.hot._selfAccepted || module.hot._main) &&
+/******/ 					// removed self-accepted modules should not be required
+/******/ 					appliedUpdate[outdatedModuleId] !== warnUnexpectedRequire &&
+/******/ 					// when called invalidate self-accepting is not possible
+/******/ 					!module.hot._selfInvalidated
+/******/ 				) {
+/******/ 					outdatedSelfAcceptedModules.push({
+/******/ 						module: outdatedModuleId,
+/******/ 						require: module.hot._requireSelf,
+/******/ 						errorHandler: module.hot._selfAccepted
+/******/ 					});
+/******/ 				}
+/******/ 			}
+/******/ 		
+/******/ 			var moduleOutdatedDependencies;
+/******/ 		
+/******/ 			return {
+/******/ 				dispose: function () {
+/******/ 					currentUpdateRemovedChunks.forEach(function (chunkId) {
+/******/ 						delete installedChunks[chunkId];
+/******/ 					});
+/******/ 					currentUpdateRemovedChunks = undefined;
+/******/ 		
+/******/ 					var idx;
+/******/ 					var queue = outdatedModules.slice();
+/******/ 					while (queue.length > 0) {
+/******/ 						var moduleId = queue.pop();
+/******/ 						var module = __webpack_require__.c[moduleId];
+/******/ 						if (!module) continue;
+/******/ 		
+/******/ 						var data = {};
+/******/ 		
+/******/ 						// Call dispose handlers
+/******/ 						var disposeHandlers = module.hot._disposeHandlers;
+/******/ 						for (j = 0; j < disposeHandlers.length; j++) {
+/******/ 							disposeHandlers[j].call(null, data);
+/******/ 						}
+/******/ 						__webpack_require__.hmrD[moduleId] = data;
+/******/ 		
+/******/ 						// disable module (this disables requires from this module)
+/******/ 						module.hot.active = false;
+/******/ 		
+/******/ 						// remove module from cache
+/******/ 						delete __webpack_require__.c[moduleId];
+/******/ 		
+/******/ 						// when disposing there is no need to call dispose handler
+/******/ 						delete outdatedDependencies[moduleId];
+/******/ 		
+/******/ 						// remove "parents" references from all children
+/******/ 						for (j = 0; j < module.children.length; j++) {
+/******/ 							var child = __webpack_require__.c[module.children[j]];
+/******/ 							if (!child) continue;
+/******/ 							idx = child.parents.indexOf(moduleId);
+/******/ 							if (idx >= 0) {
+/******/ 								child.parents.splice(idx, 1);
+/******/ 							}
+/******/ 						}
+/******/ 					}
+/******/ 		
+/******/ 					// remove outdated dependency from module children
+/******/ 					var dependency;
+/******/ 					for (var outdatedModuleId in outdatedDependencies) {
+/******/ 						if (__webpack_require__.o(outdatedDependencies, outdatedModuleId)) {
+/******/ 							module = __webpack_require__.c[outdatedModuleId];
+/******/ 							if (module) {
+/******/ 								moduleOutdatedDependencies =
+/******/ 									outdatedDependencies[outdatedModuleId];
+/******/ 								for (j = 0; j < moduleOutdatedDependencies.length; j++) {
+/******/ 									dependency = moduleOutdatedDependencies[j];
+/******/ 									idx = module.children.indexOf(dependency);
+/******/ 									if (idx >= 0) module.children.splice(idx, 1);
+/******/ 								}
+/******/ 							}
+/******/ 						}
+/******/ 					}
+/******/ 				},
+/******/ 				apply: function (reportError) {
+/******/ 					// insert new code
+/******/ 					for (var updateModuleId in appliedUpdate) {
+/******/ 						if (__webpack_require__.o(appliedUpdate, updateModuleId)) {
+/******/ 							__webpack_require__.m[updateModuleId] = appliedUpdate[updateModuleId];
+/******/ 						}
+/******/ 					}
+/******/ 		
+/******/ 					// run new runtime modules
+/******/ 					for (var i = 0; i < currentUpdateRuntime.length; i++) {
+/******/ 						currentUpdateRuntime[i](__webpack_require__);
+/******/ 					}
+/******/ 		
+/******/ 					// call accept handlers
+/******/ 					for (var outdatedModuleId in outdatedDependencies) {
+/******/ 						if (__webpack_require__.o(outdatedDependencies, outdatedModuleId)) {
+/******/ 							var module = __webpack_require__.c[outdatedModuleId];
+/******/ 							if (module) {
+/******/ 								moduleOutdatedDependencies =
+/******/ 									outdatedDependencies[outdatedModuleId];
+/******/ 								var callbacks = [];
+/******/ 								var errorHandlers = [];
+/******/ 								var dependenciesForCallbacks = [];
+/******/ 								for (var j = 0; j < moduleOutdatedDependencies.length; j++) {
+/******/ 									var dependency = moduleOutdatedDependencies[j];
+/******/ 									var acceptCallback =
+/******/ 										module.hot._acceptedDependencies[dependency];
+/******/ 									var errorHandler =
+/******/ 										module.hot._acceptedErrorHandlers[dependency];
+/******/ 									if (acceptCallback) {
+/******/ 										if (callbacks.indexOf(acceptCallback) !== -1) continue;
+/******/ 										callbacks.push(acceptCallback);
+/******/ 										errorHandlers.push(errorHandler);
+/******/ 										dependenciesForCallbacks.push(dependency);
+/******/ 									}
+/******/ 								}
+/******/ 								for (var k = 0; k < callbacks.length; k++) {
+/******/ 									try {
+/******/ 										callbacks[k].call(null, moduleOutdatedDependencies);
+/******/ 									} catch (err) {
+/******/ 										if (typeof errorHandlers[k] === "function") {
+/******/ 											try {
+/******/ 												errorHandlers[k](err, {
+/******/ 													moduleId: outdatedModuleId,
+/******/ 													dependencyId: dependenciesForCallbacks[k]
+/******/ 												});
+/******/ 											} catch (err2) {
+/******/ 												if (options.onErrored) {
+/******/ 													options.onErrored({
+/******/ 														type: "accept-error-handler-errored",
+/******/ 														moduleId: outdatedModuleId,
+/******/ 														dependencyId: dependenciesForCallbacks[k],
+/******/ 														error: err2,
+/******/ 														originalError: err
+/******/ 													});
+/******/ 												}
+/******/ 												if (!options.ignoreErrored) {
+/******/ 													reportError(err2);
+/******/ 													reportError(err);
+/******/ 												}
+/******/ 											}
+/******/ 										} else {
+/******/ 											if (options.onErrored) {
+/******/ 												options.onErrored({
+/******/ 													type: "accept-errored",
+/******/ 													moduleId: outdatedModuleId,
+/******/ 													dependencyId: dependenciesForCallbacks[k],
+/******/ 													error: err
+/******/ 												});
+/******/ 											}
+/******/ 											if (!options.ignoreErrored) {
+/******/ 												reportError(err);
+/******/ 											}
+/******/ 										}
+/******/ 									}
+/******/ 								}
+/******/ 							}
+/******/ 						}
+/******/ 					}
+/******/ 		
+/******/ 					// Load self accepted modules
+/******/ 					for (var o = 0; o < outdatedSelfAcceptedModules.length; o++) {
+/******/ 						var item = outdatedSelfAcceptedModules[o];
+/******/ 						var moduleId = item.module;
+/******/ 						try {
+/******/ 							item.require(moduleId);
+/******/ 						} catch (err) {
+/******/ 							if (typeof item.errorHandler === "function") {
+/******/ 								try {
+/******/ 									item.errorHandler(err, {
+/******/ 										moduleId: moduleId,
+/******/ 										module: __webpack_require__.c[moduleId]
+/******/ 									});
+/******/ 								} catch (err2) {
+/******/ 									if (options.onErrored) {
+/******/ 										options.onErrored({
+/******/ 											type: "self-accept-error-handler-errored",
+/******/ 											moduleId: moduleId,
+/******/ 											error: err2,
+/******/ 											originalError: err
+/******/ 										});
+/******/ 									}
+/******/ 									if (!options.ignoreErrored) {
+/******/ 										reportError(err2);
+/******/ 										reportError(err);
+/******/ 									}
+/******/ 								}
+/******/ 							} else {
+/******/ 								if (options.onErrored) {
+/******/ 									options.onErrored({
+/******/ 										type: "self-accept-errored",
+/******/ 										moduleId: moduleId,
+/******/ 										error: err
+/******/ 									});
+/******/ 								}
+/******/ 								if (!options.ignoreErrored) {
+/******/ 									reportError(err);
+/******/ 								}
+/******/ 							}
+/******/ 						}
+/******/ 					}
+/******/ 		
+/******/ 					return outdatedModules;
+/******/ 				}
+/******/ 			};
+/******/ 		}
+/******/ 		__webpack_require__.hmrI.jsonp = function (moduleId, applyHandlers) {
+/******/ 			if (!currentUpdate) {
+/******/ 				currentUpdate = {};
+/******/ 				currentUpdateRuntime = [];
+/******/ 				currentUpdateRemovedChunks = [];
+/******/ 				applyHandlers.push(applyHandler);
+/******/ 			}
+/******/ 			if (!__webpack_require__.o(currentUpdate, moduleId)) {
+/******/ 				currentUpdate[moduleId] = __webpack_require__.m[moduleId];
+/******/ 			}
+/******/ 		};
+/******/ 		__webpack_require__.hmrC.jsonp = function (
+/******/ 			chunkIds,
+/******/ 			removedChunks,
+/******/ 			removedModules,
+/******/ 			promises,
+/******/ 			applyHandlers,
+/******/ 			updatedModulesList
+/******/ 		) {
+/******/ 			applyHandlers.push(applyHandler);
+/******/ 			currentUpdateChunks = {};
+/******/ 			currentUpdateRemovedChunks = removedChunks;
+/******/ 			currentUpdate = removedModules.reduce(function (obj, key) {
+/******/ 				obj[key] = false;
+/******/ 				return obj;
+/******/ 			}, {});
+/******/ 			currentUpdateRuntime = [];
+/******/ 			chunkIds.forEach(function (chunkId) {
+/******/ 				if (
+/******/ 					__webpack_require__.o(installedChunks, chunkId) &&
+/******/ 					installedChunks[chunkId] !== undefined
+/******/ 				) {
+/******/ 					promises.push(loadUpdateChunk(chunkId, updatedModulesList));
+/******/ 					currentUpdateChunks[chunkId] = true;
+/******/ 				} else {
+/******/ 					currentUpdateChunks[chunkId] = false;
+/******/ 				}
+/******/ 			});
+/******/ 			if (__webpack_require__.f) {
+/******/ 				__webpack_require__.f.jsonpHmr = function (chunkId, promises) {
+/******/ 					if (
+/******/ 						currentUpdateChunks &&
+/******/ 						__webpack_require__.o(currentUpdateChunks, chunkId) &&
+/******/ 						!currentUpdateChunks[chunkId]
+/******/ 					) {
+/******/ 						promises.push(loadUpdateChunk(chunkId));
+/******/ 						currentUpdateChunks[chunkId] = true;
+/******/ 					}
+/******/ 				};
+/******/ 			}
+/******/ 		};
+/******/ 		
+/******/ 		__webpack_require__.hmrM = () => {
+/******/ 			if (typeof fetch === "undefined") throw new Error("No browser support: need fetch API");
+/******/ 			return fetch(__webpack_require__.p + __webpack_require__.hmrF()).then((response) => {
+/******/ 				if(response.status === 404) return; // no update available
+/******/ 				if(!response.ok) throw new Error("Failed to fetch update manifest " + response.statusText);
+/******/ 				return response.json();
+/******/ 			});
+/******/ 		};
+/******/ 		
+/******/ 		// no on chunks loaded
+/******/ 		
+/******/ 		// no jsonp function
+/******/ 	})();
+/******/ 	
 /************************************************************************/
 /******/ 	
+/******/ 	// module cache are used so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./main.js");
+/******/ 	var __webpack_exports__ = __webpack_require__("./index.js");
 /******/ 	
 /******/ })()
 ;
